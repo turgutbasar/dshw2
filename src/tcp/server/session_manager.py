@@ -1,10 +1,3 @@
-#!/usr/bin/python
-'''
-Sudoku Game Server-Side Protocol Worker (TCP)
-Created on Nov 10, 2017
-
-@author: basar
-'''
 # Imports----------------------------------------------------------------------
 from multiprocessing import Queue
 import threading
@@ -14,6 +7,7 @@ from tcp.server import protocol
 from tcp.common import tcp_receive, tcp_send
 from socket import socket, AF_INET, SOCK_STREAM
 from json import JSONEncoder
+import SimpleXMLRPCServer
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s (%(threadName)-2s) %(message)s')
 LOG = logging.getLogger()
@@ -21,6 +15,8 @@ LOG = logging.getLogger()
 client_numerator = 0
 session_numerator = 0
 
+class SimpleThreadedXMLRPCServer(SocketServer.ThreadingMixIn, SimpleXMLRPCServer.SimpleXMLRPCServer):
+    pass
 
 # Class Impl ------------------------------------------------------------------
 class SessionManager():
@@ -103,3 +99,9 @@ class SessionManager():
 
     def get_session_list(self):
         return JSONEncoder().encode(self.__sessionlist)
+		
+	def serve(self):
+		server = SimpleThreadedXMLRPCServer(("localhost", 8001))
+        server.register_instance(self) # register your distant Object here
+        server.serve_forever()
+	
