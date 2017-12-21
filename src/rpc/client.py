@@ -1,26 +1,16 @@
 import xmlrpclib
 import client.py as cl
 
-def main():
-    http = "http://"
-    server_add = http+ '''addr''' + ":"+ '''str(args.port)'''+"/"
-    print server_add
-    global proxy
 
+def new_player(nickname, client_address, client_port):
+
+
+    server_add = "http://" + client_address + ":" + client_port + "/"
     try:
         proxy = xmlrpclib.ServerProxy(server_add)
-        print ("/nConnected to Proxy")
-
-        # the first method call
+        global client_id
+        client_id = proxy.new_player(nickname)
     except Exception as e:
-        print e
-    except KeyboardInterrupt:
-        exit(0)
+        cl.error_message(e)
 
-if __name__== "__main__":
-        main()
 
-def new_player():
-    nickname = cl.get_nickname()
-
-        return c["client_id"]
