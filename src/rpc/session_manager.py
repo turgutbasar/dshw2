@@ -2,12 +2,10 @@
 from multiprocessing import Queue
 import threading
 import logging
-from socket import error as soc_error
-from tcp.server import protocol
-from tcp.common import tcp_receive, tcp_send
-from socket import socket, AF_INET, SOCK_STREAM
+import SocketServer
 from json import JSONEncoder
 import SimpleXMLRPCServer
+
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s (%(threadName)-2s) %(message)s')
 LOG = logging.getLogger()
@@ -27,18 +25,17 @@ class SessionManager():
         self.__client_numerator = 0
         self.__session_numerator = 0
 
-    def new_player(self, nickname):
-        c = {"client_id": self.__client_numerator, "nickname": nickname}
+    def new_player(self, nickname, socket, addr):
+        c = {"client_id": self.__client_numerator, "client_socket": socket, "addr": addr,"nickname":nickname}
         self.__client_numerator += 1
         self.__clientlist.append(c)
-		# TODO : Nickname should be unique
-        self.__client_mapping[nickname] = c["client_id"]
+        self.__client_mapping[str(addr[0]) + ":" + str(addr[1])] = c["client_id"]
         return c["client_id"]
 
     def new_session(self, client_id, desired_player):
         client = self.__clienlist[client_id]
         game = {}
-        session = {"session_id": self.__session_numerator, "clients": [client_id], "game": game,
+        session = {"session_id": self.__session_numerator, "clients": [client], "game": game,
                    "desired_player": desired_player, "score_board": dict.fromKeys([client_id])}
         self.__session_numerator += 1
         self.__sessionlist.append(session)
@@ -57,7 +54,7 @@ class SessionManager():
     def is_session_ready(self, session_id):
         session = self.__sessionlist[session_id]
         if len(session["clients"]) >= session["desired_player"]:
-            return session["clients"], JSONEncoder().encode(session["game"])
+            return (session["clients"], JSONEncoder().encode(session["game"]),)
         else:
             return False
 
@@ -72,10 +69,10 @@ class SessionManager():
         else:
             score_board[client_id] -= 1
         if game.isEnded():
-			# TODO : Broadcast implementation
-            return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0})
+            return (
+            True, clients, JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0}),)
         else:
-            return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
+            return (False, clients, JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}),)
 
     def client_left_session(self, session_id, client_id):
         session = self.__sessionlist[session_id]
@@ -85,24 +82,33 @@ class SessionManager():
         scores = session["scores"]
         clients.remove(client)
         # Checks if game ended
-		# TODO : Broadcast implementation
         if len(session["clients"]) < 2:
-            return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]})
+            return (True, clients, JSONEncoder().encode(
+                {"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]}),)
         else:
-            return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores})
+            return (False, clients, JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores}),)
 
     def client_left_server(self, client_id):
         # TODO : check every session to clean user and return ended games
-        return [0]
+        session=self.__sessionlist[session_id]
+        for session_id in session:
+            del session_id
+            #Broadcast
+        return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores})
+
+
+
 
     def get_client_id(self, addr):
+
         return self.__client_mapping[str(addr[0]) + ":" + str(addr[1])]
+
+
 
     def get_session_list(self):
         return JSONEncoder().encode(self.__sessionlist)
-		
-	def serve(self, ip, port):
-		server = SimpleThreadedXMLRPCServer((ip, port))
+      
+   def serve(self, ip, port):
+      server = SimpleThreadedXMLRPCServer((ip, port))
         server.register_instance(self) # register your distant Object here
         server.serve_forever()
-	
