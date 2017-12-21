@@ -44,12 +44,6 @@ __ERR_MSGS = { __RSP_OK:'No Error',
 from socket import AF_INET, SOCK_STREAM, socket
 
 
-def get_nickname(nickname):
-    if (nickname != '') and (' ' not in nickname) and len(nickname) <= 8:
-        return 1
-    else:
-        return 0
-
 
 
 def get_address(ip, port, nick_name, notify_callback):

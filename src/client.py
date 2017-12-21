@@ -16,15 +16,17 @@ if __name__ == '__main__':
 
 name = ''
 
-def get_nick_text():
-    global nick_name
-    nick_name = nick_text.get("1.0",'end-1c')
-    if get_nickname(nick_name) == 1:
+def get_nickname():
+    global nickname
+    nickname = nick_text.get("1.0",'end-1c')
+    if (nickname != '') and (' ' not in nickname) and len(nickname) <= 8:
         write_names = open("nicknames", "a")
-        write_names.write("\n"+nick_name)
+        write_names.write("\n"+nickname)
         connect_to_server()
     else:
         error_message("your nickname is not valid")
+
+
 
 def error_message(message):
     tkMessageBox.showerror("Title", message)
@@ -59,7 +61,7 @@ def create_login_screen():
         list_name.insert(i,n)
         i+=1
     list_name.pack()
-    okay = Button(login, text="ok", command=get_nick_text, width=20)
+    okay = Button(login, text="ok", command=get_nickname, width=20)
     okay.pack({"side": "bottom"})
     nick_label = Label(login, text="Your Nickname")
     nick_label.pack()
@@ -91,8 +93,8 @@ def get_address_port():
     address_server = address_text.get("1.0", 'end-1c')
     port = port_text.get("1.0", 'end-1c')
     if name == '':
-        print "nickname",nick_name
-        get_address(address_server,port,nick_name, notify_callback)
+        print "nickname",nickname
+        get_address(address_server,port,nickname, notify_callback)
     else:
         print "name", name
         get_address(address_server,port,name, notify_callback)
