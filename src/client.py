@@ -3,7 +3,7 @@
 
 from Tkinter import *
 
-from client import get_nickname, send_session_id, create_game_session, get_address
+from client import  send_session_id, create_game_session, get_address
 import tkMessageBox
 from game_screen import SudokuApp
 
@@ -25,6 +25,12 @@ def get_nick_text():
         connect_to_server()
     else:
         error_message("your nickname is not valid")
+
+def get_nickname(nickname):
+    if (nickname != '') and (' ' not in nickname) and len(nickname) <= 8:
+        return 1
+    else:
+        return 0
 
 def error_message(message):
     tkMessageBox.showerror("Title", message)
