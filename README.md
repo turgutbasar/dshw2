@@ -1,5 +1,5 @@
-# Tartu_ds2017_hw1
-The homework of DS course, Masters, University of Tartu
+# Tartu_ds2017_hw2
+The second homework of DS course, Masters, University of Tartu
 Aytaj Aghabayli
 Gunay Abdullayeva
 Basar Turgut
@@ -12,7 +12,6 @@ Run Server(src)
 
 python server.py -p[Port] -l[Adress]
  
-Run Client(src/gui)
+Run Client(src)
 
-python __init__.py 
-
+python client.py 
