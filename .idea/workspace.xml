@@ -2,8 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fabc2d06-0702-4c56-9b3e-40dfc31ddfad" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rpc/client.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rpc/server_main.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/__init__.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/client/__init__.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/client/main.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/client/protocol.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/server/__init__.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/server/main.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/server/protocol.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tcp/server/protocol_worker.py" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/tcp/common.py" afterPath="$PROJECT_DIR$/src/rpc/common.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/tcp/server/session_manager.py" afterPath="$PROJECT_DIR$/src/rpc/session_manager.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/server.py" afterPath="$PROJECT_DIR$/src/server.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -28,7 +38,7 @@
         <entry file="file://$PROJECT_DIR$/src/rpc/client.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="288">
-              <caret line="16" column="14" lean-forward="true" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
+              <caret line="16" column="14" lean-forward="false" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -50,20 +60,10 @@
         <entry file="file://$PROJECT_DIR$/src/client.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-666">
-              <caret line="32" column="43" lean-forward="true" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
+              <caret line="32" column="43" lean-forward="false" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
               <folding>
                 <element signature="e#161#182#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="session_manager.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tcp/server/session_manager.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="28" column="30" lean-forward="true" selection-start-line="28" selection-start-column="30" selection-end-line="28" selection-end-column="30" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -143,19 +143,6 @@
               <item name="dshw2" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="rpc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="dshw2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="dshw2" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="tcp" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="dshw2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="dshw2" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="tcp" type="462c0819:PsiDirectoryNode" />
-              <item name="server" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -331,7 +318,7 @@
     <entry file="file://$PROJECT_DIR$/src/client.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-666">
-          <caret line="32" column="43" lean-forward="true" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
+          <caret line="32" column="43" lean-forward="false" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
           <folding>
             <element signature="e#161#182#0" expanded="true" />
           </folding>
@@ -349,7 +336,7 @@
     <entry file="file://$PROJECT_DIR$/src/rpc/client.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
-          <caret line="16" column="14" lean-forward="true" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
+          <caret line="16" column="14" lean-forward="false" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
           <folding />
         </state>
       </provider>
