@@ -108,7 +108,7 @@ class SessionManager():
     def get_session_list(self):
         return JSONEncoder().encode(self.__sessionlist)
       
-   def serve(self, ip, port):
-      server = SimpleThreadedXMLRPCServer((ip, port))
-        server.register_instance(self) # register your distant Object here
-        server.serve_forever()
+    def serve(self, ip, port):
+       server = SimpleThreadedXMLRPCServer((ip, port))
+       server.register_instance(self) # register your distant Object here
+       server.serve_forever()
