@@ -10,7 +10,7 @@ def new_player(nickname, client_address, client_port):
         global client_id
         client_id = proxy.new_player(nickname)
     except Exception as e:
-        print e
+        cl.error_message(e)
     except KeyboardInterrupt:
         exit(0)
 
@@ -23,14 +23,8 @@ def new_session(self, client_id, desired_player):
     self.__sessionlist.append(session)
     return session["session_id"]
 
-if __name__== "__main__":
-        main()
-        cl.error_message(e)
 
-
-def new_session(client_id, desired_player):
-
-
+        
 def join_session():
 
 
