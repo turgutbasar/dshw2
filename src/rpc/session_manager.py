@@ -2,12 +2,10 @@
 from multiprocessing import Queue
 import threading
 import logging
-from socket import error as soc_error
-from tcp.server import protocol
-from tcp.common import tcp_receive, tcp_send
-from socket import socket, AF_INET, SOCK_STREAM
+import SocketServer
 from json import JSONEncoder
 import SimpleXMLRPCServer
+
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s (%(threadName)-2s) %(message)s')
 LOG = logging.getLogger()
@@ -28,7 +26,7 @@ class SessionManager():
         self.__session_numerator = 0
 
     def new_player(self, nickname, socket, addr):
-        c = {"client_id": self.__client_numerator, "client_socket": socket, "addr": addr}
+        c = {"client_id": self.__client_numerator, "client_socket": socket, "addr": addr,"nickname":nickname}
         self.__client_numerator += 1
         self.__clientlist.append(c)
         self.__client_mapping[str(addr[0]) + ":" + str(addr[1])] = c["client_id"]
@@ -92,16 +90,23 @@ class SessionManager():
 
     def client_left_server(self, client_id):
         # TODO : check every session to clean user and return ended games
-        return [0]
+        session=self.__sessionlist[session_id]
+        for session_id in session:
+            del session_id
+            #Broadcast
+        return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores})
+
 
     def get_client_id(self, addr):
+
         return self.__client_mapping[str(addr[0]) + ":" + str(addr[1])]
+
+
 
     def get_session_list(self):
         return JSONEncoder().encode(self.__sessionlist)
-		
-	def serve(self, ip, port):
-		server = SimpleThreadedXMLRPCServer((ip, port))
+      
+    def serve(self, ip, port):
+        server = SimpleThreadedXMLRPCServer((ip, port))
         server.register_instance(self) # register your distant Object here
         server.serve_forever()
-	

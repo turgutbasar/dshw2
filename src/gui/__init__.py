@@ -57,6 +57,7 @@ def create_login_screen():
     nick_text = Text(login, width=50, height=5)
     nick_text.pack()
     mainloop()
+
 # connect to server screen
 def connect_to_server():
     login.destroy()

@@ -14,8 +14,6 @@ if __name__ == '__main__':
     path.append(a_path)
 
 
-name = ''
-
 def get_nickname():
     global nickname
     nickname = nick_text.get("1.0",'end-1c')
@@ -26,11 +24,6 @@ def get_nickname():
     else:
         error_message("your nickname is not valid")
 
-def get_nickname(nickname):
-    if (nickname != '') and (' ' not in nickname) and len(nickname) <= 8:
-        return 1
-    else:
-        return 0
 
 def error_message(message):
     tkMessageBox.showerror("Title", message)
@@ -41,8 +34,8 @@ def info_message(message):
 def on_select(event):
     #print event.widget.curselection()[0]
     print list_name.get(list_name.curselection())
-    global name
-    name = list_name.get(list_name.curselection())
+    global nickname
+    nickname = list_name.get(list_name.curselection())
     connect_to_server()
 
 def create_game_screen():
@@ -96,17 +89,16 @@ def connect_to_server():
 def get_address_port():
     address_server = address_text.get("1.0", 'end-1c')
     port = port_text.get("1.0", 'end-1c')
-    addr_port = address_server + "," + port
-    return addr_port
+    newpalyer(nickname,address_server,port)
 
 
-def notify_callback( type, data):
+'''def notify_callback( type, data):
     print("data:" + str(type))
     if type == 0:
         multiplayer_game(data)
     else:
         create_session()
-    return
+    return'''
 
 def on_click_sessions(event):
     current_session = list_box_sessions.get(list_box_sessions.curselection())

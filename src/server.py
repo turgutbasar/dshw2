@@ -26,10 +26,10 @@ if __name__ == '__main__':
                         default=DEFAULT_SERVER_PORT)
     args = parser.parse_args()
     try:
-		# Starting server
-		LOG.info('%s version %s started ...' % (___NAME, ___VER))
-		LOG.info('Using %s version %s' % ( protocol.___NAME, protocol.___VER))
-		
-		SessionManager().serve(args.listenaddr, args.listenport)
+        # Starting server
+        LOG.info('%s version %s started ...' % (___NAME, ___VER))
+        LOG.info('Using %s version %s' % ( protocol.___NAME, protocol.___VER))
+
+        SessionManager().serve(args.listenaddr, args.listenport)
     except KeyboardInterrupt:
-	LOG.info('Terminating server ...')
+        LOG.info('Terminating server ...')

@@ -13,25 +13,25 @@ LOG = logging.getLogger()
 class EventBus(threading.Thread):
     def __init__(self):
         self.__q = Queue()
-	self.__quit = False
+    self.__quit = False
         threading.Thread.__init__(self)
     
     def subscribe(self, sub):
-	self.__subscribers.append(sub)
+    self.__subscribers.append(sub)
     
     def add(self, evt):
-	self.__q.append(evt)
+    self.__q.append(evt)
 
     def terminate(self):
-	LOG.debug("Terminatig event bus...")
+    LOG.debug("Terminatig event bus...")
         self.__quit = True
         self.__q.put("DUMMY")
 
     def run(self):
-	while True:
+    while True:
             itm = self.__q.get()
             if self.__quit:
-		break;
+        break;
             for sub in self.__subscribers:
-	        sub.handle(itm)
+            sub.handle(itm)
             LOG.debug("Next Item")
