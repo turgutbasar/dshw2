@@ -3,7 +3,7 @@
 
 from Tkinter import *
 
-from client import get_nickname, send_session_id, create_game_session, get_address
+from client import  send_session_id, create_game_session, get_address
 import tkMessageBox
 from game_screen import SudokuApp
 
@@ -13,8 +13,6 @@ if __name__ == '__main__':
     # Append script working directory into PYTHONPATH
     path.append(a_path)
 
-
-name = ''
 
 def get_nickname():
     global nickname
@@ -27,7 +25,6 @@ def get_nickname():
         error_message("your nickname is not valid")
 
 
-
 def error_message(message):
     tkMessageBox.showerror("Title", message)
 
@@ -37,8 +34,8 @@ def info_message(message):
 def on_select(event):
     #print event.widget.curselection()[0]
     print list_name.get(list_name.curselection())
-    global name
-    name = list_name.get(list_name.curselection())
+    global nickname
+    nickname = list_name.get(list_name.curselection())
     connect_to_server()
 
 def create_game_screen():
@@ -92,21 +89,16 @@ def connect_to_server():
 def get_address_port():
     address_server = address_text.get("1.0", 'end-1c')
     port = port_text.get("1.0", 'end-1c')
-    if name == '':
-        print "nickname",nickname
-        get_address(address_server,port,nickname, notify_callback)
-    else:
-        print "name", name
-        get_address(address_server,port,name, notify_callback)
+    newpalyer(nickname,address_server,port)
 
 
-def notify_callback( type, data):
+'''def notify_callback( type, data):
     print("data:" + str(type))
     if type == 0:
         multiplayer_game(data)
     else:
         create_session()
-    return
+    return'''
 
 def on_click_sessions(event):
     current_session = list_box_sessions.get(list_box_sessions.curselection())

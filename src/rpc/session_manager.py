@@ -97,8 +97,6 @@ class SessionManager():
         return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores})
 
 
-
-
     def get_client_id(self, addr):
 
         return self.__client_mapping[str(addr[0]) + ":" + str(addr[1])]
@@ -109,6 +107,12 @@ class SessionManager():
         return JSONEncoder().encode(self.__sessionlist)
       
     def serve(self, ip, port):
+<<<<<<< HEAD
        server = SimpleThreadedXMLRPCServer((ip, port))
        server.register_instance(self) # register your distant Object here
        server.serve_forever()
+=======
+        server = SimpleThreadedXMLRPCServer((ip, port))
+        server.register_instance(self) # register your distant Object here
+        server.serve_forever()
+>>>>>>> 39ed5cec4ae3fdb2c600d8e7a8d8cab1998b07e6

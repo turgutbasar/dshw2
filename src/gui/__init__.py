@@ -57,6 +57,7 @@ def create_login_screen():
     nick_text = Text(login, width=50, height=5)
     nick_text.pack()
     mainloop()
+
 # connect to server screen
 def connect_to_server():
     login.destroy()
@@ -70,11 +71,13 @@ def connect_to_server():
     global address_text
     address_text = Text(root, width=50, height=2, font=("Arial", 10))
     address_text.pack()
+
     port_label = Label(root, text="port",font=("Arial", 10))
     port_label.pack()
     global port_text
     port_text = Text(root, width=50, height=2,font=("Arial", 10))
     port_text.pack()
+
     mainloop()
 
 def get_address_port():
