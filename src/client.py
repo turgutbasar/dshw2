@@ -112,7 +112,7 @@ def on_click_sessions(event):
     if proxy is not None and client_id is not None and session_id is not None:
         status = join_session(proxy, client_id, session_id)
         if status:
-            # game ssenario
+            # gameplay scenario
             pass
 
 def multiplayer_game(list_sessions):
@@ -142,14 +142,19 @@ def create_session():
     okay.pack({"side": "bottom"})
     num_label = Label(session, text="Player's number:")
     num_label.pack()
-    global player_number_text
-    player_number_text = Text(session, width=50, height=2)
-    player_number_text.pack()
+    global player_number
+    player_number = Text(session, width=50, height=2)
+    player_number.pack()
     mainloop()
 
 def create_new_session():
-    player_number = player_num_text.get("1.0", 'end-1c')
-    create_game_session(player_number)
+    global session_id
+    desired_number = player_number.get("1.0", 'end-1c')
+    if desired_number_number is not None:
+        session_id = new_session(proxy,client_id, desired_number)
+        if session_id is not None:
+            # gameplay scenario
+            pass
     print "game"
 
 def game_player_scenario():
