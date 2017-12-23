@@ -4,15 +4,15 @@ import client.py as cl
 
 
 def new_player(nickname, client_address, client_port):
-    server_add = "http://" + client_address + ":" + client_port + "/"
     try:
-        proxy = xmlrpclib.ServerProxy(server_add)
-        client_id = proxy.new_player(nickname)
-        return proxy, client_id
+        if nickname is not None and address_server == "" and port == "":
+            server_add = "http://" + client_address + ":" + client_port + "/"
+            proxy = xmlrpclib.ServerProxy(server_add)
+            client_id = proxy.new_player(nickname)
+            return proxy, client_id
     except Exception as e:
         cl.error_message(e)
 
-<<<<<<< HEAD
 def new_session(proxy, client_id, desired_player):
     try:
         session_id = proxy.new_session(client_id, desired_player)
@@ -62,28 +62,6 @@ def get_client_id(proxy, client_address):
         return client_id
     except Exception as e:
         cl.error_message(e)
-=======
-def new_session():
-    pass
-
-def join_session():
-    pass
-    
-def is_seesion_ready():
-    pass
-
-def process_game_move():
-    pass
-
-def client_left_session():
-    pass
-
-def cient_left_server():
-    pass
-
-def get_client_list():
-    pass
->>>>>>> 473c818d44c8ab34f0eea46444c4d31dfde9a5cd
 
 def get_session_list(proxy):
     try:

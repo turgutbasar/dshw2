@@ -89,8 +89,12 @@ def connect_to_server():
 def get_address_port():
     address_server = address_text.get("1.0", 'end-1c')
     port = port_text.get("1.0", 'end-1c')
-    newpalyer(nickname,address_server,port)
-
+    global proxy
+    global client_id
+    proxy, client_id = newpalyer(nickname,address_server,port)
+    if proxy is not None:
+        list_sessions = get_session_list(proxy)
+        multiplayer_game(list_sessions)
 
 '''def notify_callback( type, data):
     print("data:" + str(type))
@@ -101,9 +105,15 @@ def get_address_port():
     return'''
 
 def on_click_sessions(event):
-    current_session = list_box_sessions.get(list_box_sessions.curselection())
-    print current_session
-    send_session_id(current_session)
+    global session_id
+    global status
+    session_id = list_box_sessions.get(list_box_sessions.curselection())
+    print session_id
+    if proxy is not None and client_id is not None and session_id is not None:
+        status = join_session(proxy, client_id, session_id)
+        if status:
+            # game ssenario
+            pass
 
 def multiplayer_game(list_sessions):
     root.destroy()
