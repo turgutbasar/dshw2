@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fabc2d06-0702-4c56-9b3e-40dfc31ddfad" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/client.py" afterPath="$PROJECT_DIR$/src/client.py" />
-      <change beforePath="$PROJECT_DIR$/src/event_bus.py" afterPath="$PROJECT_DIR$/src/event_bus.py" />
-      <change beforePath="$PROJECT_DIR$/src/gui/__init__.py" afterPath="$PROJECT_DIR$/src/gui/__init__.py" />
       <change beforePath="$PROJECT_DIR$/src/rpc/client.py" afterPath="$PROJECT_DIR$/src/rpc/client.py" />
-      <change beforePath="$PROJECT_DIR$/src/rpc/server_main.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/rpc/session_manager.py" afterPath="$PROJECT_DIR$/src/rpc/session_manager.py" />
-      <change beforePath="$PROJECT_DIR$/src/server.py" afterPath="$PROJECT_DIR$/src/server.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,11 +23,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="client.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="client.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rpc/client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="5" column="54" lean-forward="false" selection-start-line="5" selection-start-column="54" selection-end-line="5" selection-end-column="54" />
+            <state relative-caret-position="486">
+              <caret line="27" column="0" lean-forward="true" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -42,11 +35,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="session_manager.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="session_manager.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rpc/session_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="628">
-              <caret line="105" column="31" lean-forward="true" selection-start-line="105" selection-start-column="31" selection-end-line="105" selection-end-column="31" />
+            <state relative-caret-position="826">
+              <caret line="105" column="31" lean-forward="false" selection-start-line="105" selection-start-column="31" selection-end-line="105" selection-end-column="31" />
+              <folding>
+                <marker date="1513945543950" expanded="true" signature="603:4531" ph="..." />
+                <marker date="1513945543950" expanded="true" signature="4140:4531" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="common.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/rpc/common.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -119,12 +125,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/rpc/client.py" />
         <option value="$PROJECT_DIR$/src/gui/__init__.py" />
         <option value="$PROJECT_DIR$/src/client.py" />
         <option value="$PROJECT_DIR$/src/server.py" />
         <option value="$PROJECT_DIR$/src/event_bus.py" />
         <option value="$PROJECT_DIR$/src/rpc/session_manager.py" />
+        <option value="$PROJECT_DIR$/src/rpc/client.py" />
       </list>
     </option>
   </component>
@@ -168,12 +174,6 @@
               <item name="dshw2" type="b2602c69:ProjectViewProjectNode" />
               <item name="dshw2" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="dshw2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="dshw2" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="gui" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="dshw2" type="b2602c69:ProjectViewProjectNode" />
@@ -287,14 +287,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/gui/client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="33" column="24" lean-forward="true" selection-start-line="33" selection-start-column="24" selection-end-line="33" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/gui/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
@@ -347,7 +339,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="504">
           <caret line="36" column="5" lean-forward="false" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="53" />
-          <folding />
+          <folding>
+            <marker date="1513945543950" expanded="true" signature="603:4531" ph="..." />
+            <marker date="1513945543950" expanded="true" signature="4140:4531" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -411,7 +406,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="504">
           <caret line="36" column="5" lean-forward="false" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="53" />
-          <folding />
+          <folding>
+            <marker date="1513945543950" expanded="true" signature="603:4531" ph="..." />
+            <marker date="1513945543950" expanded="true" signature="4140:4531" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -465,7 +463,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="504">
           <caret line="36" column="5" lean-forward="false" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="53" />
-          <folding />
+          <folding>
+            <marker date="1513945543950" expanded="true" signature="603:4531" ph="..." />
+            <marker date="1513945543950" expanded="true" signature="4140:4531" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -519,7 +520,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="504">
           <caret line="36" column="5" lean-forward="false" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="53" />
-          <folding />
+          <folding>
+            <marker date="1513945543950" expanded="true" signature="603:4531" ph="..." />
+            <marker date="1513945543950" expanded="true" signature="4140:4531" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -601,7 +605,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="25" column="34" lean-forward="true" selection-start-line="25" selection-start-column="34" selection-end-line="25" selection-end-column="34" />
-          <folding />
+          <folding>
+            <marker date="1513945543950" expanded="true" signature="603:4531" ph="..." />
+            <marker date="1513945543950" expanded="true" signature="4140:4531" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -671,16 +678,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rpc/client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="5" column="54" lean-forward="false" selection-start-line="5" selection-start-column="54" selection-end-line="5" selection-end-column="54" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
@@ -709,9 +706,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rpc/session_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="628">
-          <caret line="105" column="31" lean-forward="true" selection-start-line="105" selection-start-column="31" selection-end-line="105" selection-end-column="31" />
+        <state relative-caret-position="826">
+          <caret line="105" column="31" lean-forward="false" selection-start-line="105" selection-start-column="31" selection-end-line="105" selection-end-column="31" />
+          <folding>
+            <marker date="1513945543950" expanded="true" signature="603:4531" ph="..." />
+            <marker date="1513945543950" expanded="true" signature="4140:4531" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rpc/common.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rpc/client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="27" column="0" lean-forward="true" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
