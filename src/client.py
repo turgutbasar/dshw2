@@ -142,14 +142,14 @@ def create_session():
     okay.pack({"side": "bottom"})
     num_label = Label(session, text="Player's number:")
     num_label.pack()
-    global player_num_text
-    player_num_text = Text(session, width=50, height=2)
-    player_num_text.pack()
+    global player_number_text
+    player_number_text = Text(session, width=50, height=2)
+    player_number_text.pack()
     mainloop()
 
 def create_new_session():
-    player_num = player_num_text.get("1.0", 'end-1c')
-    create_game_session(player_num)
+    player_number = player_num_text.get("1.0", 'end-1c')
+    create_game_session(player_number)
     print "game"
 
 def game_player_scenario():
