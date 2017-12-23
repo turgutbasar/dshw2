@@ -51,7 +51,7 @@ def client_left_session(proxy, session_id, client_id):
 
 def client_left_server(proxy, client_id):
     try:
-        game = proxy.client_left_server(cliend_id)
+        game = proxy.client_left_server(client_id)
         return game
     except Exception as e:
         cl.error_message(e)
