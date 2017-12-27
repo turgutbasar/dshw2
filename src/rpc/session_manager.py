@@ -50,7 +50,7 @@ class SessionManager():
             if len(session["clients"]) == session["desired_player"]:
 				# Broadcasting
 				return JSONEncoder().encode({ "isAvailable":True ,"game":session["game"] })
-			else:
+            else:
 				return JSONEncoder().encode({ "isAvailable":True })
 
     def process_game_move(self, session_id, client_id, move):
@@ -86,7 +86,7 @@ class SessionManager():
     def client_left_server(self, client_id):
         session=self.__sessionlist[session_id]
         for session_id in session:
-			self.client_left_session(session_id, client_id)
+            self.client_left_session(session_id, client_id)
             del session_id
             #Broadcast
 
