@@ -5,6 +5,7 @@ import logging
 import SocketServer
 from json import JSONEncoder
 import SimpleXMLRPCServer
+import pika
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s (%(threadName)-2s) %(message)s')
@@ -23,6 +24,9 @@ class SessionManager():
         self.__clientlist = []
         self.__client_numerator = 0
         self.__session_numerator = 0
+		connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+		self.__channel = connection.channel()
+		self.__channel.queue_declare(queue='broadcast_queue')
 
     def new_player(self, nickname):
         c = {"client_id": self.__client_numerator, "nickname":nickname}
@@ -49,6 +53,7 @@ class SessionManager():
             session["score_board"][client_id] = 0
             if len(session["clients"]) == session["desired_player"]:
 				# Broadcasting
+				broadcast(JSONEncoder().encode({ "isAvailable":True ,"game":session["game"] }))
 				return JSONEncoder().encode({ "isAvailable":True ,"game":session["game"] })
 			else:
 				return JSONEncoder().encode({ "isAvailable":True })
@@ -65,8 +70,10 @@ class SessionManager():
             score_board[client_id] -= 1
 		# Broadcasting
         if game.isEnded():
+			broadcast(JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0}))
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0})
         else:
+			broadcast(JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}))
             return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
 
     def client_left_session(self, session_id, client_id):
@@ -79,8 +86,10 @@ class SessionManager():
         # Checks if game ended
 		# Broadcasting
         if len(session["clients"]) < 2:
+			broadcast(JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]}))
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]})
         else:
+			broadcast(JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}))
             return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
 
     def client_left_server(self, client_id):
@@ -97,3 +106,7 @@ class SessionManager():
         server = SimpleThreadedXMLRPCServer((ip, port))
         server.register_instance(self) # register your distant Object here
         server.serve_forever()
+
+	# Broadcasting
+	def broadcast(msg):
+		channel.basic_publish(exchange='', routing_key='broadcast_queue', body=str(msg))
