@@ -75,10 +75,7 @@ class SessionManager():
             score_board[client_id] += 1
         else:
             score_board[client_id] -= 1
-<<<<<<< HEAD
-        # Broadcasting
 
-            '''check'''
          
 
         if game.isEnded():
