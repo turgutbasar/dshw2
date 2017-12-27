@@ -1,14 +1,15 @@
 import xmlrpclib
 
-import client.py as cl
+import src.client.py as cl
 
 
 def new_player(nickname, client_address, client_port):
-    server_add = "http://" + client_address + ":" + client_port + "/"
     try:
-        proxy = xmlrpclib.ServerProxy(server_add)
-        client_id = proxy.new_player(nickname)
-        return proxy, client_id
+        if nickname is not None and address_server == "" and port == "":
+            server_add = "http://" + client_address + ":" + client_port + "/"
+            proxy = xmlrpclib.ServerProxy(server_add)
+            client_id = proxy.new_player(nickname)
+            return proxy, client_id
     except Exception as e:
         cl.error_message(e)
 

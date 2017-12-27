@@ -6,6 +6,7 @@ from Tkinter import *
 from client import  send_session_id, create_game_session, get_address
 import tkMessageBox
 from game_screen import SudokuApp
+import rpc.client.py
 
 if __name__ == '__main__':
     # Find the script absolute path, cut the working directory
@@ -89,8 +90,12 @@ def connect_to_server():
 def get_address_port():
     address_server = address_text.get("1.0", 'end-1c')
     port = port_text.get("1.0", 'end-1c')
-    newpalyer(nickname,address_server,port)
-
+    global proxy
+    global client_id
+    proxy, client_id = newpalyer(nickname,address_server,port)
+    if proxy is not None:
+        list_sessions = get_session_list(proxy)
+        multiplayer_game(list_sessions)
 
 '''def notify_callback( type, data):
     print("data:" + str(type))
@@ -101,9 +106,15 @@ def get_address_port():
     return'''
 
 def on_click_sessions(event):
-    current_session = list_box_sessions.get(list_box_sessions.curselection())
-    print current_session
-    send_session_id(current_session)
+    global session_id
+    global status
+    session_id = list_box_sessions.get(list_box_sessions.curselection())
+    print session_id
+    if proxy is not None and client_id is not None and session_id is not None:
+        status = join_session(proxy, client_id, session_id)
+        if status:
+            # gameplay scenario
+            pass
 
 def multiplayer_game(list_sessions):
     root.destroy()
@@ -132,14 +143,19 @@ def create_session():
     okay.pack({"side": "bottom"})
     num_label = Label(session, text="Player's number:")
     num_label.pack()
-    global player_num_text
-    player_num_text = Text(session, width=50, height=2)
-    player_num_text.pack()
+    global player_number
+    player_number = Text(session, width=50, height=2)
+    player_number.pack()
     mainloop()
 
 def create_new_session():
-    player_num = player_num_text.get("1.0", 'end-1c')
-    create_game_session(player_num)
+    global session_id
+    desired_number = player_number.get("1.0", 'end-1c')
+    if desired_number_number is not None:
+        session_id = new_session(proxy,client_id, desired_number)
+        if session_id is not None:
+            # gameplay scenario
+            pass
     print "game"
 
 def game_player_scenario():
