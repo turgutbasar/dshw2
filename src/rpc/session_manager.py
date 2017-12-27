@@ -41,7 +41,6 @@ class SessionManager():
 
         return JSONEncoder().encode({"session_id":session["session_id"] })
 
-        return session["session_id"]
 
 
     def join_session(self, client_id, session_id):
@@ -54,12 +53,12 @@ class SessionManager():
             session["score_board"][client_id] = 0
             if len(session["clients"]) == session["desired_player"]:
 
-                # Broadcasting
+                self.broadcast(JSONEncoder().encode(session["game"]))
                 return JSONEncoder().encode({"isAvailable":True ,"game":session["game"]})
             else:
                 return JSONEncoder().encode({"isAvailable":True})
 
-             self.broadcast(JSONEncoder().encode(session["game"]))
+             
             return JSONEncoder().encode(session["game"])
        else:
             return True
@@ -75,8 +74,6 @@ class SessionManager():
             score_board[client_id] += 1
         else:
             score_board[client_id] -= 1
-
-         
 
         if game.isEnded():
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0})
