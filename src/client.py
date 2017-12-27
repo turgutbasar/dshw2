@@ -6,6 +6,7 @@ from Tkinter import *
 from client import  send_session_id, create_game_session, get_address
 import tkMessageBox
 from game_screen import SudokuApp
+import rpc.client.py
 
 if __name__ == '__main__':
     # Find the script absolute path, cut the working directory
