@@ -37,7 +37,7 @@ class SessionManager():
                    "desired_player": desired_player, "score_board": dict.fromKeys([client_id])}
         self.__session_numerator += 1
         self.__sessionlist.append(session)
-        return JSONEncoder().encode({ "session_id":session["session_id"] })
+        return JSONEncoder().encode({"session_id":session["session_id"] })
 
     def join_session(self, client_id, session_id):
         session = self.__sessionlist[session_id]
@@ -48,10 +48,10 @@ class SessionManager():
             session["clients"].append(client)
             session["score_board"][client_id] = 0
             if len(session["clients"]) == session["desired_player"]:
-				# Broadcasting
-				return JSONEncoder().encode({ "isAvailable":True ,"game":session["game"] })
-			else:
-				return JSONEncoder().encode({ "isAvailable":True })
+                # Broadcasting
+                return JSONEncoder().encode({"isAvailable":True ,"game":session["game"]})
+            else:
+                return JSONEncoder().encode({"isAvailable":True})
 
     def process_game_move(self, session_id, client_id, move):
         session = self.__sessionlist[session_id]
@@ -63,7 +63,7 @@ class SessionManager():
             score_board[client_id] += 1
         else:
             score_board[client_id] -= 1
-		# Broadcasting
+        # Broadcasting
         if game.isEnded():
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0})
         else:
@@ -77,7 +77,7 @@ class SessionManager():
         scores = session["scores"]
         clients.remove(client)
         # Checks if game ended
-		# Broadcasting
+        # Broadcasting
         if len(session["clients"]) < 2:
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]})
         else:
@@ -86,7 +86,7 @@ class SessionManager():
     def client_left_server(self, client_id):
         session=self.__sessionlist[session_id]
         for session_id in session:
-			self.client_left_session(session_id, client_id)
+            self.client_left_session(session_id, client_id)
             del session_id
             #Broadcast
 
