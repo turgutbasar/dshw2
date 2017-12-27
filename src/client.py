@@ -2,7 +2,6 @@
 # Main method -----------------------------------------------------------------
 
 from Tkinter import *
-
 import tkMessageBox
 from gui.game_screen import SudokuApp
 import rpc.client as cl

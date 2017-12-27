@@ -28,7 +28,7 @@ class SessionManager():
         c = {"client_id": self.__client_numerator, "nickname":nickname}
         self.__client_numerator += 1
         self.__clientlist.append(c)
-        return c["client_id"]
+        return JSONEncoder().encode({ "client_id":c["client_id"] })
 
     def new_session(self, client_id, desired_player):
         client = self.__clientlist[client_id]
@@ -37,21 +37,21 @@ class SessionManager():
                    "desired_player": desired_player, "score_board": dict.fromKeys([client_id])}
         self.__session_numerator += 1
         self.__sessionlist.append(session)
-        return session["session_id"]
+        return JSONEncoder().encode({ "session_id":session["session_id"] })
 
     def join_session(self, client_id, session_id):
         session = self.__sessionlist[session_id]
         client = self.__clientlist[client_id]
         if len(session["clients"]) >= session["desired_player"]:
-            return False
+            JSONEncoder().encode({ "isAvailable":False })
         else:
             session["clients"].append(client)
             session["score_board"][client_id] = 0
             if len(session["clients"]) == session["desired_player"]:
 				# Broadcasting
-				return JSONEncoder().encode(session["game"])
+				return JSONEncoder().encode({ "isAvailable":True ,"game":session["game"] })
 			else:
-				return True
+				return JSONEncoder().encode({ "isAvailable":True })
 
     def process_game_move(self, session_id, client_id, move):
         session = self.__sessionlist[session_id]
@@ -89,13 +89,6 @@ class SessionManager():
 			self.client_left_session(session_id, client_id)
             del session_id
             #Broadcast
-        return True
-
-
-    def get_client_id(self, addr):
-        return self.__client_mapping[str(addr[0]) + ":" + str(addr[1])]
-
-
 
     def get_session_list(self):
         return JSONEncoder().encode(self.__sessionlist)
