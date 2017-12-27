@@ -64,6 +64,7 @@ def get_client_id(proxy, client_address):
 
 def get_session_list(proxy):
     try:
+        #deqiqleshdir
         session_list = proxy.get_session_list()
         return session_list
     except Exception as e:
