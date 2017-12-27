@@ -30,11 +30,6 @@ def on_select(event):
     nickname = list_name.get(list_name.curselection())
     connect_to_server()
 
-def create_game_screen():
-    sudoku = Tk()
-    app = SudokuApp(sudoku)
-    mainloop()
-
 # show nickname screen
 def create_login_screen():
     read_names = open("nicknames", "r")
@@ -95,6 +90,19 @@ def get_address_port():
     else:
         create_session()
     return'''
+def create_game_screen(status):
+    if status["isAvailable"]:
+        if "game" in status:
+            game = status["game"]
+            sudoku = Tk()
+            app = SudokuApp(sudoku)
+
+        else:
+            print "game is not ready"
+    else:
+        print "click event"
+
+    mainloop()
 
 def on_click_sessions(event):
     global session_id
@@ -103,9 +111,8 @@ def on_click_sessions(event):
     print session_id
     if proxy is not None and client_id is not None and session_id is not None:
         status = cl.join_session(proxy, client_id["client_id"], session_id)
-        if status["isAvailable"]:
-            # gameplay scenario
-            pass
+        create_game_screen(status)
+
 
 def multiplayer_game(list_sessions):
     root.destroy()
@@ -145,9 +152,8 @@ def create_new_session():
     if desired_number is not None:
         session_id = cl.new_session(proxy,client_id["client_id"], desired_number)
         if session_id is not None:
-            # gameplay scenario
-            pass
-    print "game"
+            status = cl.join_session(proxy, client_id, session_id["session_id"])
+            create_game_screen(status)
 
 def game_player_scenario():
     print "senario"
