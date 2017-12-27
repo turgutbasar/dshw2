@@ -21,19 +21,17 @@ class SessionManager():
     def __init__(self):
         self.__sessionlist = []
         self.__clientlist = []
-        self.__client_mapping = {}
         self.__client_numerator = 0
         self.__session_numerator = 0
 
-    def new_player(self, nickname, socket, addr):
-        c = {"client_id": self.__client_numerator, "client_socket": socket, "addr": addr,"nickname":nickname}
+    def new_player(self, nickname):
+        c = {"client_id": self.__client_numerator, "nickname":nickname}
         self.__client_numerator += 1
         self.__clientlist.append(c)
-        self.__client_mapping[str(addr[0]) + ":" + str(addr[1])] = c["client_id"]
         return c["client_id"]
 
     def new_session(self, client_id, desired_player):
-        client = self.__clienlist[client_id]
+        client = self.__clientlist[client_id]
         game = {}
         session = {"session_id": self.__session_numerator, "clients": [client], "game": game,
                    "desired_player": desired_player, "score_board": dict.fromKeys([client_id])}
@@ -49,14 +47,11 @@ class SessionManager():
         else:
             session["clients"].append(client)
             session["score_board"][client_id] = 0
-            return True
-
-    def is_session_ready(self, session_id):
-        session = self.__sessionlist[session_id]
-        if len(session["clients"]) >= session["desired_player"]:
-            return (session["clients"], JSONEncoder().encode(session["game"]),)
-        else:
-            return False
+            if len(session["clients"]) == session["desired_player"]:
+				# Broadcasting
+				return JSONEncoder().encode(session["game"])
+			else:
+				return True
 
     def process_game_move(self, session_id, client_id, move):
         session = self.__sessionlist[session_id]
@@ -68,11 +63,11 @@ class SessionManager():
             score_board[client_id] += 1
         else:
             score_board[client_id] -= 1
+		# Broadcasting
         if game.isEnded():
-            return (
-            True, clients, JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0}),)
+            return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0})
         else:
-            return (False, clients, JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}),)
+            return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
 
     def client_left_session(self, session_id, client_id):
         session = self.__sessionlist[session_id]
@@ -82,23 +77,22 @@ class SessionManager():
         scores = session["scores"]
         clients.remove(client)
         # Checks if game ended
+		# Broadcasting
         if len(session["clients"]) < 2:
-            return (True, clients, JSONEncoder().encode(
-                {"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]}),)
+            return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]})
         else:
-            return (False, clients, JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores}),)
+            return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
 
     def client_left_server(self, client_id):
-        # TODO : check every session to clean user and return ended games
         session=self.__sessionlist[session_id]
         for session_id in session:
+			self.client_left_session(session_id, client_id)
             del session_id
             #Broadcast
-        return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores})
+        return True
 
 
     def get_client_id(self, addr):
-
         return self.__client_mapping[str(addr[0]) + ":" + str(addr[1])]
 
 
