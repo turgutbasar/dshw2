@@ -2,7 +2,6 @@
 # Main method -----------------------------------------------------------------
 
 from Tkinter import *
-
 import tkMessageBox
 from gui.game_screen import SudokuApp
 import rpc.client as cl
@@ -84,7 +83,7 @@ def get_address_port():
     port = port_text.get("1.0", 'end-1c')
     global proxy
     global client_id
-    proxy, client_id = cl.newpalyer(nickname,address_server,port)
+    proxy, client_id = cl.newplayer(nickname,address_server,port)
     if proxy is not None:
         list_sessions = cl.get_session_list(proxy)
         multiplayer_game(list_sessions)
@@ -103,8 +102,8 @@ def on_click_sessions(event):
     session_id = list_box_sessions.get(list_box_sessions.curselection())
     print session_id
     if proxy is not None and client_id is not None and session_id is not None:
-        status = cl.join_session(proxy, client_id, session_id)
-        if status:
+        status = cl.join_session(proxy, client_id["client_id"], session_id)
+        if status["isAvailable"]:
             # gameplay scenario
             pass
 
@@ -144,7 +143,7 @@ def create_new_session():
     global session_id
     desired_number = player_number.get("1.0", 'end-1c')
     if desired_number is not None:
-        session_id = cl.new_session(proxy,client_id, desired_number)
+        session_id = cl.new_session(proxy,client_id["client_id"], desired_number)
         if session_id is not None:
             # gameplay scenario
             pass
