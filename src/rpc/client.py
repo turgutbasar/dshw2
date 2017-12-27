@@ -5,7 +5,7 @@ import client.py as cl
 
 def new_player(nickname, client_address, client_port):
     try:
-        if nickname is not None and address_server == "" and port == "":
+        if nickname is not None and client_address != "" and client_port != "":
             server_add = "http://" + client_address + ":" + client_port + "/"
             proxy = xmlrpclib.ServerProxy(server_add)
             client_id = proxy.new_player(nickname)

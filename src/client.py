@@ -3,17 +3,9 @@
 
 from Tkinter import *
 
-from client import  send_session_id, create_game_session, get_address
 import tkMessageBox
-from game_screen import SudokuApp
-import rpc.client.py
-
-if __name__ == '__main__':
-    # Find the script absolute path, cut the working directory
-    a_path = sep.join(abspath(argv[0]).split(sep)[:-1])
-    # Append script working directory into PYTHONPATH
-    path.append(a_path)
-
+from gui.game_screen import SudokuApp
+import rpc.client as cl
 
 def get_nickname():
     global nickname
@@ -92,9 +84,9 @@ def get_address_port():
     port = port_text.get("1.0", 'end-1c')
     global proxy
     global client_id
-    proxy, client_id = newpalyer(nickname,address_server,port)
+    proxy, client_id = cl.newpalyer(nickname,address_server,port)
     if proxy is not None:
-        list_sessions = get_session_list(proxy)
+        list_sessions = cl.get_session_list(proxy)
         multiplayer_game(list_sessions)
 
 '''def notify_callback( type, data):
@@ -111,7 +103,7 @@ def on_click_sessions(event):
     session_id = list_box_sessions.get(list_box_sessions.curselection())
     print session_id
     if proxy is not None and client_id is not None and session_id is not None:
-        status = join_session(proxy, client_id, session_id)
+        status = cl.join_session(proxy, client_id, session_id)
         if status:
             # gameplay scenario
             pass
@@ -151,8 +143,8 @@ def create_session():
 def create_new_session():
     global session_id
     desired_number = player_number.get("1.0", 'end-1c')
-    if desired_number_number is not None:
-        session_id = new_session(proxy,client_id, desired_number)
+    if desired_number is not None:
+        session_id = cl.new_session(proxy,client_id, desired_number)
         if session_id is not None:
             # gameplay scenario
             pass
@@ -161,11 +153,12 @@ def create_new_session():
 def game_player_scenario():
     print "senario"
 
-create_login_screen()
+if __name__ == '__main__':
+    create_login_screen()
+    # a_path = sep.join(abspath(argv[0]).split(sep)[:-1])
+    # Append script working directory into PYTHONPATH
+    #path.append(a_path)
 
-#multiplayer_game(9)
-
-#create_session()
 
 
 
