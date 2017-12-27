@@ -38,11 +38,11 @@ class SessionManager():
                    "desired_player": desired_player, "score_board": dict.fromKeys([client_id])}
         self.__session_numerator += 1
         self.__sessionlist.append(session)
-<<<<<<< HEAD
+
         return JSONEncoder().encode({"session_id":session["session_id"] })
-=======
+
         return session["session_id"]
->>>>>>> 423533152559da03f6f25e52c7bc94d30f6a7165
+
 
     def join_session(self, client_id, session_id):
         session = self.__sessionlist[session_id]
@@ -53,17 +53,17 @@ class SessionManager():
             session["clients"].append(client)
             session["score_board"][client_id] = 0
             if len(session["clients"]) == session["desired_player"]:
-<<<<<<< HEAD
+
                 # Broadcasting
                 return JSONEncoder().encode({"isAvailable":True ,"game":session["game"]})
             else:
                 return JSONEncoder().encode({"isAvailable":True})
-=======
+
              self.broadcast(JSONEncoder().encode(session["game"]))
             return JSONEncoder().encode(session["game"])
        else:
             return True
->>>>>>> 423533152559da03f6f25e52c7bc94d30f6a7165
+
 
     def process_game_move(self, session_id, client_id, move):
         session = self.__sessionlist[session_id]
@@ -77,10 +77,10 @@ class SessionManager():
             score_board[client_id] -= 1
 <<<<<<< HEAD
         # Broadcasting
-=======
+
             '''check'''
          
->>>>>>> 423533152559da03f6f25e52c7bc94d30f6a7165
+
         if game.isEnded():
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0})
             self.broadcast(JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0}))
@@ -95,11 +95,7 @@ class SessionManager():
         scores = session["scores"]
         clients.remove(client)
         # Checks if game ended
-<<<<<<< HEAD
-        # Broadcasting
-=======
-        
->>>>>>> 423533152559da03f6f25e52c7bc94d30f6a7165
+
         if len(session["clients"]) < 2:
             self.broadcast(JSONEncoder().encode(
                 {"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]}))
@@ -110,11 +106,11 @@ class SessionManager():
     def client_left_server(self, client_id):
         session=self.__sessionlist[session_id]
         for session_id in session:
-<<<<<<< HEAD
+
             self.client_left_session(session_id, client_id)
-=======
+
          self.client_left_session(session_id, client_id)
->>>>>>> 423533152559da03f6f25e52c7bc94d30f6a7165
+
             del session_id
         
             
