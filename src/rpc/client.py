@@ -1,4 +1,5 @@
 import xmlrpclib
+import threading
 
 import src.client as cl
 from json import JSONDecoder
@@ -77,3 +78,10 @@ def get_session_list(proxy):
         cl.error_message(e)
 
 
+class Client(threading.Thread):
+    def __init__(self):
+        self.broadcast_queue = self.channel.queue_declare(exclusive=True).method.queue
+
+        self.channel.queue_bind(exchange="broadcast_exchange", queue=self.broadcast_queue)
+        self.channel.basic_consume(self.__on_broadcast, no_ack=True, queue=self.broadcast_queue)
+        threading.Thread.__init__(self)
