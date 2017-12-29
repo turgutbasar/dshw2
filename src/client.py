@@ -4,7 +4,7 @@
 from Tkinter import *
 import tkMessageBox
 from gui.game_screen import SudokuApp
-import rpc.client as cl
+from rpc.client import get_session_list, new_player, new_session, join_session
 from os.path import abspath, sep
 from sys import path,argv
 
@@ -80,10 +80,18 @@ def get_address_port():
     port = port_text.get("1.0", 'end-1c')
     global proxy
     global client_id
-    proxy, client_id = cl.newplayer(nickname)
-    if proxy is not None:
-        list_sessions = cl.get_session_list(proxy)
-        multiplayer_game(list_sessions)
+    player = new_player(nickname, address_server, port)
+    if "error" in player:
+        error_message(player["error"])
+    else:
+        proxy = player["proxy"]
+        client_id = player["client_id"]
+        if player is not None:
+            list_sessions = get_session_list(player["proxy"])
+            if "error" in list_sessions:
+                error_message(list_sessions["error"])
+            else:
+                multiplayer_game(list_sessions)
 
 '''def notify_callback( type, data):
     print("data:" + str(type))
@@ -98,7 +106,7 @@ def create_game_screen(status):
             game = status["game"]
             sudoku = Tk()
             app = SudokuApp(sudoku)
-
+            mainloop()
         else:
             print "game is not ready"
     else:
@@ -112,8 +120,12 @@ def on_click_sessions(event):
     session_id = list_box_sessions.get(list_box_sessions.curselection())
     print session_id
     if proxy is not None and client_id is not None and session_id is not None:
-        status = cl.join_session(proxy, client_id["client_id"], session_id)
-        create_game_screen(status)
+        status = join_session(proxy, client_id["client_id"], session_id)
+        print status
+        if "error" in status:
+            error_message(status["error"])
+        else:
+            create_game_screen(status)
 
 
 def multiplayer_game(list_sessions):
@@ -152,10 +164,13 @@ def create_new_session():
     global session_id
     desired_number = player_number.get("1.0", 'end-1c')
     if desired_number is not None:
-        session_id = cl.new_session(proxy,client_id["client_id"], desired_number)
-        if session_id is not None:
-            status = cl.join_session(proxy, client_id, session_id["session_id"])
-            create_game_screen(status)
+        session_id = new_session(proxy, client_id["client_id"], desired_number)
+        if "error" in session_id:
+            error_message(session_id["error"])
+        else:
+            if session_id is not None:
+                 status = join_session(proxy, client_id, session_id["session_id"])
+                 create_game_screen(status)
 
 def game_player_scenario():
     print "senario"
