@@ -4,6 +4,28 @@ import pika
 
 import src.client as cl
 from json import JSONDecoder
+import pika
+
+class BroadcastReceiver(threading.Thread):
+    def __init__(self, callback):
+	self.nickname = ""
+	self.tags = []
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.channel = self.connection.channel()
+	self.broadcast_queue = self.channel.queue_declare(exclusive=True).method.queue
+
+	self.channel.queue_bind(exchange='broadcast_exchange', queue=self.broadcast_queue)
+
+
+	self.channel.basic_consume(callback, no_ack=True,
+                                   queue=self.broadcast_queue)
+	threading.Thread.__init__(self)
+
+    def run(self):
+	self.channel.start_consuming()
+
+def new_broadcast_receiver(callback):
+    return BroadcastReceiver(callback)
 
 def new_player(nickname, server_address, server_port):
     try:
