@@ -1,8 +1,9 @@
 import xmlrpclib
 
-import src.client as cl
+import client as cl
 from json import JSONDecoder
 import pika
+import threading
 
 class BroadcastReceiver(threading.Thread):
     def __init__(self, callback):

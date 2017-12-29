@@ -8,7 +8,7 @@ import SimpleXMLRPCServer
 import pika
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s (%(threadName)-2s) %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s (%(threadName)-2s) %(message)s')
 LOG = logging.getLogger()
 
 client_numerator = 0
@@ -24,9 +24,9 @@ class SessionManager():
         self.__clientlist = []
         self.__client_numerator = 0
         self.__session_numerator = 0
-		connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-		self.__channel = connection.channel()
-		self.__channel.queue_declare(queue='broadcast_queue')
+	connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+	self.__channel = connection.channel()
+	self.__channel.queue_declare(queue='broadcast_queue')
 
     def new_player(self, nickname):
         c = {"client_id": self.__client_numerator, "nickname":nickname}
@@ -52,10 +52,10 @@ class SessionManager():
             session["clients"].append(client)
             session["score_board"][client_id] = 0
             if len(session["clients"]) == session["desired_player"]:
-				self.broadcast(JSONEncoder().encode({ "isGameStarted":True, "isAvailable":True ,"game":session["game"] }))
-				return JSONEncoder().encode({ "isAvailable":True, "isGameStarted":True ,"game":session["game"] })
-			else:
-				return JSONEncoder().encode({ "isAvailable":True , "isGameStarted":False })
+		self.broadcast(JSONEncoder().encode({ "isGameStarted":True, "isAvailable":True ,"game":session["game"] }))
+		return JSONEncoder().encode({ "isAvailable":True, "isGameStarted":True ,"game":session["game"] })
+	    else:
+		return JSONEncoder().encode({ "isAvailable":True , "isGameStarted":False })
 
     def process_game_move(self, session_id, client_id, move):
         session = self.__sessionlist[session_id]
@@ -68,10 +68,10 @@ class SessionManager():
         else:
             score_board[client_id] -= 1
         if game.isEnded():
-			self.broadcast(JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0}))
+	    self.broadcast(JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0}))
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": 0})
         else:
-			self.broadcast(JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}))
+	    self.broadcast(JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}))
             return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
 
     def client_left_session(self, session_id, client_id):
@@ -83,10 +83,10 @@ class SessionManager():
         clients.remove(client)
 		
         if len(session["clients"]) < 2:
-			self.broadcast(JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]}))
+	    self.broadcast(JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]}))
             return JSONEncoder().encode({"game": game, "isEnded": True, "scores": scores, "winner": session["clients"][0]})
         else:
-			self.broadcast(JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}))
+	    self.broadcast(JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}))
             return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
 
     def client_left_server(self, client_id):
@@ -103,5 +103,5 @@ class SessionManager():
         server.register_instance(self) # register your distant Object here
         server.serve_forever()
 
-	def broadcast(self, msg):
-		channel.basic_publish(exchange='', routing_key='broadcast_queue', body=str(msg))
+    def broadcast(self, msg):
+	channel.basic_publish(exchange='', routing_key='broadcast_queue', body=str(msg))

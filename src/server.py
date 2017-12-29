@@ -1,7 +1,9 @@
 # Imports----------------------------------------------------------------------
 from argparse import ArgumentParser # Parsing command line arguments
-from tcp.common import DEFAULT_SERVER_INET_ADDR, DEFAULT_SERVER_PORT
+from rpc.common import DEFAULT_SERVER_INET_ADDR, DEFAULT_SERVER_PORT
 from rpc.session_manager import SessionManager
+from os.path import abspath, sep
+from sys import path,argv
 
 import logging
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s (%(threadName)-2s) %(message)s')
@@ -14,8 +16,8 @@ if __name__ == '__main__':
     # Append script working directory into PYTHONPATH
     path.append(a_path)
     # Parsing arguments
-    parser = ArgumentParser(description=__info(),
-                            version = ___VER)
+    parser = ArgumentParser(description="",
+                            version = "")
     parser.add_argument('-l','--listenaddr', \
                         help='Bind server socket to INET address, '\
                         'defaults to %s' % DEFAULT_SERVER_INET_ADDR, \
@@ -26,10 +28,6 @@ if __name__ == '__main__':
                         default=DEFAULT_SERVER_PORT)
     args = parser.parse_args()
     try:
-        # Starting server
-        LOG.info('%s version %s started ...' % (___NAME, ___VER))
-        LOG.info('Using %s version %s' % ( protocol.___NAME, protocol.___VER))
-
         SessionManager().serve(args.listenaddr, args.listenport)
     except KeyboardInterrupt:
         LOG.info('Terminating server ...')
