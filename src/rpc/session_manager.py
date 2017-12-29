@@ -8,7 +8,7 @@ import SimpleXMLRPCServer
 import pika
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s (%(threadName)-2s) %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s (%(threadName)-2s) %(message)s')
 LOG = logging.getLogger()
 
 client_numerator = 0
@@ -27,6 +27,7 @@ class SessionManager():
         connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self.__channel = connection.channel()
         self.__channel.queue_declare(queue='broadcast_queue')
+
 
     def new_player(self, nickname):
         c = {"client_id": self.__client_numerator, "nickname":nickname}
@@ -56,6 +57,7 @@ class SessionManager():
                 return JSONEncoder().encode({ "isAvailable":True, "isGameStarted":True ,"game":session["game"] })
             else:
                 return JSONEncoder().encode({ "isAvailable":True , "isGameStarted":False })
+
 
     def process_game_move(self, session_id, client_id, move):
         session = self.__sessionlist[session_id]
@@ -89,11 +91,11 @@ class SessionManager():
             self.broadcast(JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores}))
             return JSONEncoder().encode({"game": game, "isEnded": False, "scores": scores})
 
-    def client_left_server(self, client_id):
-        session=self.__sessionlist[session_id]
-        for session_id in session:
-            self.client_left_session(session_id, client_id)
-            del session_id
+#    def client_left_server(self, client_id):
+#        session=self.__sessionlist[session_id]
+#        for session_id in session:
+#            self.client_left_session(session_id, client_id)
+#            del session_id
 
     def get_session_list(self):
         return JSONEncoder().encode(self.__sessionlist)
@@ -104,4 +106,4 @@ class SessionManager():
         server.serve_forever()
 
     def broadcast(self, msg):
-        channel.basic_publish(exchange='', routing_key='broadcast_queue', body=str(msg))
+        self.__channel.basic_publish(exchange='', routing_key='broadcast_queue', body=str(msg))

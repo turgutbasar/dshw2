@@ -5,6 +5,8 @@ from Tkinter import *
 import tkMessageBox
 from gui.game_screen import SudokuApp
 import rpc.client as cl
+from os.path import abspath, sep
+from sys import path,argv
 
 def get_nickname():
     global nickname
@@ -78,7 +80,7 @@ def get_address_port():
     port = port_text.get("1.0", 'end-1c')
     global proxy
     global client_id
-    proxy, client_id = cl.newplayer(nickname,address_server,port)
+    proxy, client_id = cl.newplayer(nickname)
     if proxy is not None:
         list_sessions = cl.get_session_list(proxy)
         multiplayer_game(list_sessions)
@@ -159,11 +161,10 @@ def game_player_scenario():
     print "senario"
 
 if __name__ == '__main__':
-    create_login_screen()
-    # a_path = sep.join(abspath(argv[0]).split(sep)[:-1])
+    a_path = sep.join(abspath(argv[0]).split(sep)[:-1])
     # Append script working directory into PYTHONPATH
-    #path.append(a_path)
-
+    path.append(a_path)
+    create_login_screen()
 
 
 
