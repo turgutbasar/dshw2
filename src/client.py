@@ -27,7 +27,6 @@ def info_message(message):
 
 def on_select(event):
     #print event.widget.curselection()[0]
-    print list_name.get(list_name.curselection())
     global nickname
     nickname = list_name.get(list_name.curselection())
     connect_to_server()
@@ -117,11 +116,9 @@ def create_game_screen(status):
 def on_click_sessions(event):
     global session_id
     global status
-    session_id = list_box_sessions.get(list_box_sessions.curselection())
-    print session_id
+    session_id = int(list_box_sessions.get(list_box_sessions.curselection()))
     if proxy is not None and client_id is not None and session_id is not None:
         status = join_session(proxy, client_id["client_id"], session_id)
-        print status
         if "error" in status:
             error_message(status["error"])
         else:
@@ -138,7 +135,7 @@ def multiplayer_game(list_sessions):
     list_box_sessions.bind('<<ListboxSelect>>', on_click_sessions)
     i = 0
     for n in list_sessions:
-        list_box_sessions.insert(i, n)
+        list_box_sessions.insert(i, n["session_id"])
         i += 1
     list_box_sessions.pack()
     okay = Button(game, text="create new session", command = create_session, width=20)
@@ -165,6 +162,7 @@ def create_new_session():
     desired_number = player_number.get("1.0", 'end-1c')
     if desired_number is not None:
         session_id = new_session(proxy, client_id["client_id"], desired_number)
+        print session_id
         if "error" in session_id:
             error_message(session_id["error"])
         else:
