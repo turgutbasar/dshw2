@@ -36,18 +36,12 @@ class SessionManager():
         return JSONEncoder().encode({"client_id":c["client_id"] })
 
     def new_session(self, client_id, desired_player):
-        print "1"
         client = self.__clientlist[client_id]
-        print "2"
         game = {}
-        print "3"
         session = {"session_id": self.__session_numerator, "clients": [client], "game": game,
                    "desired_player": desired_player, "score_board": dict.fromkeys([client_id])}
-        print "4"
         self.__session_numerator += 1
-        print "5"
         self.__sessionlist.append(session)
-        print "6"
         return JSONEncoder().encode({"session_id":session["session_id"] })
 
     def join_session(self, client_id, session_id):
@@ -58,11 +52,14 @@ class SessionManager():
         else:
             session["clients"].append(client)
             session["score_board"][client_id] = 0
-            if len(session["clients"]) == session["desired_player"]:
-                self.broadcast(JSONEncoder().encode({ "isGameStarted":True, "isAvailable":True ,"game":session["game"] }))
-                return JSONEncoder().encode({ "isAvailable":True, "isGameStarted":True ,"game":session["game"] })
-            else:
-                return JSONEncoder().encode({ "isAvailable":True , "isGameStarted":False })
+            print session["clients"]
+            print session["desired_player"]
+ #           if len(session["clients"]) == session["desired_player"]:
+            self.broadcast(JSONEncoder().encode({ "isGameStarted":True, "isAvailable":True ,"game":session["game"] }))
+            return JSONEncoder().encode({ "isAvailable":True, "isGameStarted":True ,"game":session["game"] })
+#            else:
+
+            return JSONEncoder().encode({ "isAvailable":True , "isGameStarted":False })
 
 
     def process_game_move(self, session_id, client_id, move):

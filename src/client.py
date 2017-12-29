@@ -92,20 +92,16 @@ def get_address_port():
             else:
                 multiplayer_game(list_sessions)
 
-'''def notify_callback( type, data):
-    print("data:" + str(type))
-    if type == 0:
-        multiplayer_game(data)
-    else:
-        create_session()
-    return'''
+
 def create_game_screen(status):
+    print status
     if status["isAvailable"]:
         if "game" in status:
             game = status["game"]
-            sudoku = Tk()
-            app = SudokuApp(sudoku)
-            mainloop()
+            print game
+#            sudoku = Tk()
+#            app = SudokuApp(sudoku)
+#            mainloop()
         else:
             print "game is not ready"
     else:
@@ -167,7 +163,8 @@ def create_new_session():
             error_message(session_id["error"])
         else:
             if session_id is not None:
-                 status = join_session(proxy, client_id, session_id["session_id"])
+                 status = join_session(proxy, client_id["client_id"], session_id["session_id"])
+                 print client_id
                  create_game_screen(status)
 
 def game_player_scenario():
