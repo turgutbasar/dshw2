@@ -1,6 +1,4 @@
 # Imports----------------------------------------------------------------------
-# Main method -----------------------------------------------------------------
-
 from Tkinter import *
 import tkMessageBox
 from gui.game_screen import SudokuApp
@@ -8,175 +6,171 @@ from rpc.client import get_session_list, new_player, new_session, join_session
 from os.path import abspath, sep
 from sys import path,argv
 
-def get_nickname():
-    global nickname
-    nickname = nick_text.get("1.0",'end-1c')
-    if (nickname != '') and (' ' not in nickname) and len(nickname) <= 8:
-        write_names = open("nicknames", "a")
-        write_names.write("\n"+nickname)
-        connect_to_server()
-    else:
-        error_message("your nickname is not valid")
+# Vars -----------------------------------------------------------------
+nickname = ""
+login_screen_frame = None
+connect_server_screen_frame = None
+multiplayer_game_screen_frame = None
+new_session_screen_frame = None
+sudoku_app = None
+proxy = None
+client_id = None
+session = None
 
-
+# Methods -----------------------------------------------------------------
 def error_message(message):
-    tkMessageBox.showerror("Title", message)
+    tkMessageBox.showerror("Error", message)
 
 def info_message(message):
-    tkMessageBox.showinfo("Title", message)
-
-def on_select(event):
-    #print event.widget.curselection()[0]
-    global nickname
-    nickname = list_name.get(list_name.curselection())
-    connect_to_server()
+    tkMessageBox.showinfo("Info", message)
 
 # show nickname screen
-def create_login_screen():
+def login_screen():
+    def on_select(event):
+    	widget = event.widget
+	global nickname    	
+	nickname = widget.get(widget.curselection())
+    	connect_server_screen()
+
+    def get_nickname(tb_nick):
+	global nickname
+    	nickname = tb_nick.get("1.0",'end-1c')
+    	if (nickname != '') and (' ' not in nickname) and len(nickname) <= 8:
+            write_names = open("nicknames", "a")
+            write_names.write("\n"+nickname)
+            connect_server_screen()
+        else:
+            error_message("your nickname is not valid")
+
     read_names = open("nicknames", "r")
     names = read_names.read().split()
-    global login
-    login = Tk()
-    login.title("Enter Nickname")
-    global list_name
-    list_name = Listbox(login, selectmode='single')
-    list_name.bind('<<ListboxSelect>>', on_select)
-    i = 0
+    global login_screen_frame
+    login_screen_frame = Tk()
+    login_screen_frame.title("Enter Nickname")
+    lb_names = Listbox(login_screen_frame, selectmode='single')
+    lb_names.bind('<<ListboxSelect>>', on_select)
     for n in names:
-        list_name.insert(i,n)
-        i+=1
-    list_name.pack()
-    okay = Button(login, text="ok", command=get_nickname, width=20)
-    okay.pack({"side": "bottom"})
-    nick_label = Label(login, text="Your Nickname")
-    nick_label.pack()
-    global nick_text
-    nick_text = Text(login, width=50, height=5)
-    nick_text.pack()
-    mainloop()
+        lb_names.insert(END,n)
+    lb_names.pack()
+    btn_okay = Button(login_screen_frame, text="ok", command=lambda : get_nickname(tb_nick), width=20)
+    btn_okay.pack({"side": "bottom"})
+    lbl_nickname = Label(login_screen_frame, text="Your Nickname")
+    lbl_nickname.pack()
+    tb_nick = Text(login_screen_frame, width=50, height=5)
+    tb_nick.pack()
+
 # connect to server screen
-def connect_to_server():
-    login.destroy()
-    global root
-    root = Tk()
-    root.title("Enter Sudoku server address")
-    okay = Button(root, text="ok", command=get_address_port, width=20)
-    okay.pack({"side": "bottom"})
-    address_label = Label(root, text="server address",font=("Arial", 10))
-    address_label.pack()
-    global address_text
-    address_text = Text(root, width=50, height=2, font=("Arial", 10))
-    address_text.pack()
-    port_label = Label(root, text="port",font=("Arial", 10))
-    port_label.pack()
-    global port_text
-    port_text = Text(root, width=50, height=2,font=("Arial", 10))
-    port_text.pack()
-    mainloop()
-
-def get_address_port():
-    address_server = address_text.get("1.0", 'end-1c')
-    port = port_text.get("1.0", 'end-1c')
-    global proxy
-    global client_id
-    player = new_player(nickname, address_server, port)
-    if "error" in player:
-        error_message(player["error"])
-    else:
-        proxy = player["proxy"]
-        client_id = player["client_id"]
-        if player is not None:
-            list_sessions = get_session_list(player["proxy"])
-            if "error" in list_sessions:
-                error_message(list_sessions["error"])
+def connect_server_screen():
+    def get_address_port(tb_addr, tb_port):
+    	addr = tb_addr.get("1.0", 'end-1c')
+    	port = tb_port.get("1.0", 'end-1c')
+	global nickname
+    	player = new_player(nickname, addr, port)
+    	if "error" in player:
+	    error_message(player["error"])
+    	else:
+	    global proxy
+	    proxy = player["proxy"]
+	    global client_id
+            client_id = player["client_id"]["client_id"]
+            session_list = get_session_list(proxy)
+            if "error" in session_list:
+                error_message(session_list["error"])
             else:
-                multiplayer_game(list_sessions)
+                multiplayer_game_screen(session_list) 
+    login_screen_frame.destroy()
+    global connect_server_screen_frame
+    connect_server_screen_frame = Tk()
+    connect_server_screen_frame.title("Enter Sudoku server address")
+    okay = Button(connect_server_screen_frame, text="ok", command=lambda:get_address_port(tb_addr, tb_port), width=20)
+    okay.pack({"side": "bottom"})
+    lbl_address = Label(connect_server_screen_frame, text="Server Address",font=("Arial", 10))
+    lbl_address.pack()
+    tb_addr = Text(connect_server_screen_frame, width=50, height=2, font=("Arial", 10))
+    tb_addr.pack()
+    lbl_port = Label(connect_server_screen_frame, text="Server Port",font=("Arial", 10))
+    lbl_port.pack()
+    tb_port = Text(connect_server_screen_frame, width=50, height=2,font=("Arial", 10))
+    tb_port.pack()
 
+# multiplayer game screen
+def multiplayer_game_screen(list_sessions):
 
-def create_game_screen(status):
-    print status
-    if status["isAvailable"]:
-        if "game" in status:
-            game = status["game"]
-            print game
-#            sudoku = Tk()
-#            app = SudokuApp(sudoku)
-#            mainloop()
-        else:
-            print "game is not ready"
-    else:
-        print "click event"
-
-    mainloop()
-
-def on_click_sessions(event):
-    global session_id
-    global status
-    session_id = int(list_box_sessions.get(list_box_sessions.curselection()))
-    if proxy is not None and client_id is not None and session_id is not None:
-        status = join_session(proxy, client_id["client_id"], session_id)
+    def on_select(event):
+	widget = event.widget
+	global session_id
+	global proxy
+    	session_id = int(widget.get(widget.curselection()))
+        status = join_session(proxy, client_id, session_id)
         if "error" in status:
             error_message(status["error"])
         else:
-            create_game_screen(status)
+            start_game_screen(status)
 
+    connect_server_screen_frame.destroy()
+    global multiplayer_game_screen_frame
+    multiplayer_game_screen_frame = Tk()
+    multiplayer_game_screen_frame.title("Multiplayer Game Dialog ")
+    lb_sessions = Listbox(multiplayer_game_screen_frame,height = 5,font=("Arial", 10),selectmode='single')
+    lb_sessions.bind('<<ListboxSelect>>', on_select)
+    for session in list_sessions:
+        lb_sessions.insert(END, session["session_id"])
+    lb_sessions.pack()
+    btn_okay = Button(multiplayer_game_screen_frame, text="New Session", command = new_session_screen, width=20)
+    btn_okay.pack({"side": "bottom"})
 
-def multiplayer_game(list_sessions):
-    root.destroy()
-    global game
-    game = Tk()
-    game.title("Multiplayer Game Dialog ")
-    global list_box_sessions
-    list_box_sessions = Listbox(game,height = 5,font=("Arial", 10),selectmode='single')
-    list_box_sessions.bind('<<ListboxSelect>>', on_click_sessions)
-    i = 0
-    for n in list_sessions:
-        list_box_sessions.insert(i, n["session_id"])
-        i += 1
-    list_box_sessions.pack()
-    okay = Button(game, text="create new session", command = create_session, width=20)
-    okay.pack({"side": "bottom"})
-    mainloop()
+# new session screen
+def new_session_screen():
 
-def create_session():
-    print("create sesson")
-    game.destroy()
-    global session
-    session = Tk()
-    session.title("Creating new Sudoku Solving Session")
-    okay = Button(session, text="ok", command = create_new_session, width=20)
-    okay.pack({"side": "bottom"})
-    num_label = Label(session, text="Player's number:")
-    num_label.pack()
-    global player_number
-    player_number = Text(session, width=50, height=2)
-    player_number.pack()
-    mainloop()
+    def session(tb_player_number):
+    	player_number = tb_player_number.get("1.0", 'end-1c')
+    	if player_number is not None:
+	    global client_id
+	    print client_id
+	    global session_id
+	    global proxy
+            session = new_session(proxy, client_id, player_number)
+	    
+            if "error" in session:
+            	error_message(session["error"])
+            else:
+                status = join_session(proxy, client_id, session["session_id"])
+                start_game_screen(status)
 
-def create_new_session():
-    global session_id
-    desired_number = player_number.get("1.0", 'end-1c')
-    if desired_number is not None:
-        session_id = new_session(proxy, client_id["client_id"], desired_number)
-        print session_id
-        if "error" in session_id:
-            error_message(session_id["error"])
-        else:
-            if session_id is not None:
-                 status = join_session(proxy, client_id["client_id"], session_id["session_id"])
-                 print client_id
-                 create_game_screen(status)
+    multiplayer_game_screen_frame.destroy()
+    global new_session_screen_frame
+    new_session_screen_frame = Tk()
+    new_session_screen_frame.title("New Sudoku Solving Session")
+    lbl_player_number = Label(new_session_screen_frame, text="Number of Players:")
+    lbl_player_number.pack()
+    tb_player_number = Text(new_session_screen_frame, width=50, height=2)
+    tb_player_number.pack()
+    btn_okay = Button(new_session_screen_frame, text="Ok", command = lambda: session(tb_player_number), width=20)
+    btn_okay.pack({"side": "bottom"})
 
-def game_player_scenario():
-    print "senario"
+# start game screen
+def start_game_screen(status):
+    if not new_session_screen_frame:
+    	new_session_screen_frame.destroy()
+    if not multiplayer_game_screen_frame:
+    	multiplayer_game_screen_frame.destroy()
+
+    global sudoku_app
+    sudoku_screen_frame = Tk()
+    # TODO : Wait till all users connected! (Desired player count reached!)
+    sudoku_app = SudokuApp(sudoku_screen_frame, status["game"])
+
+# wait screen
+def waiting_screen():
+    global sudoku_app
+    sudoku_screen_frame = Tk()
+    # TODO : Wait till all users connected! (Desired player count reached!)
+    sudoku_app = SudokuApp(sudoku_screen_frame, status["game"])
+
 
 if __name__ == '__main__':
     a_path = sep.join(abspath(argv[0]).split(sep)[:-1])
     # Append script working directory into PYTHONPATH
     path.append(a_path)
-    create_login_screen()
-
-
-
-
-
+    login_screen()
+    mainloop()

@@ -1,6 +1,4 @@
 class Sudoku(object):
-    global sudoku_board
-    global sudoku_puzzle
     def __init__(self):
         self.sudoku_board = [[4,3,5,2,6,9,7,8,1],
                [6,8,2,5,7,1,4,9,3],

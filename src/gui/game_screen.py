@@ -2,7 +2,6 @@ import Tkinter
 import platform
 import tkFileDialog as filedialog
 from Tkinter import *
-
 from oosudoku import *
 
 if platform.system() == 'Windows':
@@ -56,9 +55,6 @@ class Commands(Frame):
 
         self.canvas = canvas
         self.sudoku = None
-
-    #=== Three Buttons ====#
-
 
     #=== Create Buttons Events ====#
 
@@ -128,8 +124,6 @@ class View(Frame):
                                     self.CanvasGame.itemconfig(self.table[t[1]][t[0]], tag='Fixed')
                                 self.Update() # We update the display
        
-        #==== Update Items ===#
-
     def Update(self):
         # Update the Label
         self.labelVariable.set(self.sudoku.game_status())
@@ -138,11 +132,6 @@ class View(Frame):
             for j in range(0,9):
                 if " " not in self.sudoku._game[i][j]:
                     self.CanvasGame.itemconfig(self.table[j][i], text=self.sudoku._game[i][j], font = large_font, tag='Fixed', fill="red")
-        # Update the choices Numbers --> All items which are "Text" tagged are displayed in blue or not (depending on the Show/Hide choices Button)
-
-
-
-        #==== GET/SET Methods ===#
         
     def SetNumberButtons(self, numberbuttons):
         self.numberbuttons = numberbuttons
@@ -151,19 +140,9 @@ class View(Frame):
     def SetCommands(self, commands):
         self.commands = commands
 
-
-                    ##############################
-                    #===== CONTROLLER CLASS =====#
-                    ##############################
-
-
-
 class Controller(Frame):
     """ Create:
         2 Frames : one contains a view instance(canvas + lable), the other contains a numberbuttons instance and a commands instance
-        1 menu "File" which give the possibility:
-            * to open a file and load a game
-            * Exit the game
     """
     def __init__(self, parent):
         Frame.__init__(self, parent, bg = "grey")
@@ -174,15 +153,7 @@ class Controller(Frame):
         self.numberbuttons = NumberButtons(self.F2)
         self.view.SetNumberButtons(self.numberbuttons)
         self.commands = Commands(self.F2, self.view)
-
-        #MenuBar
-        self.menubar = Menu(self)
-        self.filemenu = Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Begin Game", command=self.LoadGame)
-        self.filemenu.add_command(label="Exit", command=self.QuitGame)
-        self.menubar.add_cascade(label="Begin or Exit", menu=self.filemenu)
-        parent.config(menu=self.menubar)
-
+        
         #Display
         self.F1.pack(fill = Y, side=LEFT)
         self.F2.pack(fill = Y, side=LEFT)
@@ -190,48 +161,26 @@ class Controller(Frame):
         self.numberbuttons.pack(side = LEFT, padx = 20)
         self.commands.pack(side = LEFT)
 
-
-
-
-
-
-        #=== Function LoadGame & QuitGame ===#
-
-    def LoadGame(self):
+    def LoadGame(self, game):
         
-        # Open a file
-        filePath = 'game.txt' # The user has to open a file
-
-        # Initialization : We check if it is a proper sudoku game file. Otherwise we print a message on the stdout
-        #try:
-        self.sudoku = Sudoku(filePath, False)
+        self.sudoku = Sudoku(game, False)
         self.commands.SetSudoku(self.sudoku)
-      #  self.commands.Button1.config(state = "normal") # The 3 Buttons become usable when the user loads a proper game
-     #   self.commands.Button2.config(state = "normal")
-      #  self.commands.Button3.config(state = "normal")
         self.view.SetSudoku(self.sudoku)
         self.view.SetCommands(self.commands)
         self.view.Update()
 
-        # except Exception as e:
-        #     print("This is not a proper sudoku game file - Try again !")
-        #     print(e)
-
-    def QuitGame(self): # if the user press exit in the menu => we close the window and stop the program
-        self.parent.destroy()
-        self.parent.quit()
-
-##
-
 class SudokuApp():
-    """ The Sudoku application """
-
-    def __init__(self, master=None):
+    def __init__(self, game, master=None):
         master.title("Sudoku")
         master.config(bg = "grey")
         master.resizable(0,0)
         self.controller = Controller(master)
-
-
-
-
+	self.controller.LoadGame([[" "," "," ","2","6"," ","7"," ","1"],
+               ["6","8"," "," ","7"," "," ","9"," "],
+               ["1","9"," "," "," ","4","5"," "," "],
+               ["8","2"," ","1"," "," "," ","4"," "],
+               [" "," ","4","6"," ","2","9"," "," "],
+               [" ","5"," "," "," ","3"," ","2","8"],
+               [" "," ","9","3"," "," "," ","7","4"],
+               [" ","4"," "," ","5"," "," ","3","6"],
+               ["7"," ","3"," ","1","8"," "," "," "]])

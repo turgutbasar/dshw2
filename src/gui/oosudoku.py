@@ -46,24 +46,15 @@ class Sudoku:
 
 
 
-    def _read_game(self, filename):
-        """Return a list representation of the game.
-
-        _read_game(string) -> void
-        Precondition: The file can be opened for reading and contains 9
-        lines with each line representing a row of the game.
-
-        """
-        f = open('game.txt', 'r')
-        for line in f:
-            self._game.append(row2list(line))
-        f.close()
+    def _read_game(self, game):
+        for row in game:
+            self._game.append(row)
 
 
-    def __init__(self, filename, autofill = False):
+    def __init__(self, game_arr, autofill = False):
      
         self._game = []
-        self._read_game(filename)
+        self._read_game(game_arr)
         self._undo_stack = []  # keeps move info for later undos
         self._do_auto_fill = autofill  # determine if auto fill should be used
 

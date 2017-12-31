@@ -36,12 +36,14 @@ class SessionManager():
         return JSONEncoder().encode({"client_id":c["client_id"] })
 
     def new_session(self, client_id, desired_player):
+	print "Test"
         client = self.__clientlist[client_id]
         game = {}
         session = {"session_id": self.__session_numerator, "clients": [client], "game": game,
                    "desired_player": desired_player, "score_board": dict.fromkeys([client_id])}
         self.__session_numerator += 1
         self.__sessionlist.append(session)
+	print session
         return JSONEncoder().encode({"session_id":session["session_id"] })
 
     def join_session(self, client_id, session_id):
