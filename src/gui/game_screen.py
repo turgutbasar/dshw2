@@ -1,22 +1,10 @@
 import Tkinter
-import platform
-import tkFileDialog as filedialog
 from Tkinter import *
 from oosudoku import *
 
-if platform.system() == 'Windows':
-    small_font = ("Courier New", "10", "bold")
-    large_font = ("Courier New", "21", "bold")
-else:
-    small_font = ("Courier New", "10", "bold")
-    large_font = ("Courier New", "25", "bold") 
-
-
-box_size = 50
-half = box_size/2
+large_font = ("Courier New", "21", "bold")
 
 class NumberButtons(Frame):
-    """ A frame containing the 9 choice buttons """
 
     def __init__(self, parent):
         Frame.__init__(self, parent, relief=SUNKEN, bg = "grey")
@@ -32,55 +20,15 @@ class NumberButtons(Frame):
             self.buttons.append(bi)
         self.current.set(1)
 
-
     def get_current(self):
-        """ Return the current choice """
-
         return self.current.get()
 
-
-                    ############################
-                    #===== COMMANDS CLASS =====#
-                    ############################
-
-class Commands(Frame):
-    """ Create :
-        3 Buttons which interact with the canvas
-        Button 1 : Show or Hide the available choices for the game
-        Button 2 : Auto fill or not the game
-        Button 3 : Undo the latest action
-    """
-    def __init__(self, parent, canvas):
-        Frame.__init__(self, parent, bg = "grey")
-
-        self.canvas = canvas
-        self.sudoku = None
-
-    #=== Create Buttons Events ====#
-
-
-    def SetSudoku(self, sudoku):
-        self.sudoku = sudoku
-
-
-                    ########################
-                    #===== VIEW CLASS =====#
-                    ########################
-
 class View(Frame):
-    """ Create:
-        1 canvas with 9x9 Texts (i.e. sudoku case) + Ligns
-        1 Table which contains ids of all Text items logically related to the table sudoku.game[][]
-        1 Label wich displays the state of the game
-    """
     def __init__(self, parent):
         Frame.__init__(self, parent, bg = "grey")
 
         self.sudoku = None
         self.numberbuttons = None
-        self.commands = None
-
-        #=== Canvas ===#
 
         # Initialize the Canvas
         self.CanvasSize = 500 
@@ -104,25 +52,18 @@ class View(Frame):
         self.label = Label(self, textvariable=self.labelVariable, font = large_font, bg="grey", fg="red")
         self.label.pack(pady = 10)
 
-        #==== Create Mouse Event ===#
-        """If the Player click on a empty "case" (i.e. item with a tag 'Text') and the number he tries to insert is consistent with the
-        available choices, he will success. Otherwise nothing happens. After each success, the display is updated"""
-
         self.CanvasGame.bind("<Button-1>", self.Write) # If the player left-click on the canvas => execute the method Write
 
     def Write(self, event):
-        if self.sudoku != None: # To be sure that the user cannot interact with the canvas when no game is loaded
-            items = self.CanvasGame.find_enclosed(event.x - 35,event.y -35 , event.x +35,event.y +35) # We consider all items enclosed in a square 70x70 where the user clicked (the size of the square depends strongly on the canvas.size) 
-            item = list_intersection(items, self.CanvasGame.find_withtag('Text')) # We just consider previous selected items which are empty "case"(i.e. item with a tag 'Text')
-            if len(item) == 1:
-                for i in range(0,9):
-                    for j in range(0,9):
-                        if int(item[0]) == int(self.table[j][i]):
-                            if str(self.numberbuttons.get_current()) in self.sudoku.choices(i,j): # We check what the user tries to insert is consistent with the available choices
-                                self.sudoku.set_entry(i,j,str(self.numberbuttons.get_current()))  # We Update game[][]
-                                for t in self.sudoku._undo_stack[-1]:
-                                    self.CanvasGame.itemconfig(self.table[t[1]][t[0]], tag='Fixed')
-                                self.Update() # We update the display
+        items = self.CanvasGame.find_enclosed(event.x - 35,event.y -35 , event.x +35,event.y +35) # We consider all items enclosed in a square 70x70 where the user clicked (the size of the square depends strongly on the canvas.size) 
+        item = list_intersection(items, self.CanvasGame.find_withtag('Text')) # We just consider previous selected items which are empty "case"(i.e. item with a tag 'Text')
+        if len(item) == 1:
+            for i in range(0,9):
+                for j in range(0,9):
+                    if int(item[0]) == int(self.table[j][i]):
+                        if str(self.numberbuttons.get_current()) in self.sudoku.choices(i,j): # We check what the user tries to insert is consistent with the available choices
+                            self.sudoku.set_entry(i,j,str(self.numberbuttons.get_current()))  # We Update game[][]
+                            self.Update() # We update the display
        
     def Update(self):
         # Update the Label
@@ -135,10 +76,9 @@ class View(Frame):
         
     def SetNumberButtons(self, numberbuttons):
         self.numberbuttons = numberbuttons
+
     def SetSudoku(self, sudoku):
         self.sudoku = sudoku
-    def SetCommands(self, commands):
-        self.commands = commands
 
 class Controller(Frame):
     """ Create:
@@ -152,35 +92,23 @@ class Controller(Frame):
         self.view = View(self.F1)
         self.numberbuttons = NumberButtons(self.F2)
         self.view.SetNumberButtons(self.numberbuttons)
-        self.commands = Commands(self.F2, self.view)
         
         #Display
         self.F1.pack(fill = Y, side=LEFT)
         self.F2.pack(fill = Y, side=LEFT)
         self.view.pack(side = LEFT, padx = 30)
         self.numberbuttons.pack(side = LEFT, padx = 20)
-        self.commands.pack(side = LEFT)
 
     def LoadGame(self, game):
         
         self.sudoku = Sudoku(game, False)
-        self.commands.SetSudoku(self.sudoku)
         self.view.SetSudoku(self.sudoku)
-        self.view.SetCommands(self.commands)
         self.view.Update()
 
 class SudokuApp():
-    def __init__(self, game, master=None):
+    def __init__(self, master, game):
         master.title("Sudoku")
         master.config(bg = "grey")
         master.resizable(0,0)
         self.controller = Controller(master)
-	self.controller.LoadGame([[" "," "," ","2","6"," ","7"," ","1"],
-               ["6","8"," "," ","7"," "," ","9"," "],
-               ["1","9"," "," "," ","4","5"," "," "],
-               ["8","2"," ","1"," "," "," ","4"," "],
-               [" "," ","4","6"," ","2","9"," "," "],
-               [" ","5"," "," "," ","3"," ","2","8"],
-               [" "," ","9","3"," "," "," ","7","4"],
-               [" ","4"," "," ","5"," "," ","3","6"],
-               ["7"," ","3"," ","1","8"," "," "," "]])
+	self.controller.LoadGame(game.get_puzzle())

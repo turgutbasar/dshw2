@@ -6,7 +6,7 @@ import SocketServer
 from json import JSONEncoder
 import SimpleXMLRPCServer
 import pika
-
+from sudoku.game import Sudoku
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s (%(threadName)-2s) %(message)s')
 LOG = logging.getLogger()
@@ -38,12 +38,11 @@ class SessionManager():
     def new_session(self, client_id, desired_player):
 	print "Test"
         client = self.__clientlist[client_id]
-        game = {}
-        session = {"session_id": self.__session_numerator, "clients": [client], "game": game,
-                   "desired_player": desired_player, "score_board": dict.fromkeys([client_id])}
+        game = {}#Sudoku()
+        session = {"session_id": self.__session_numerator, "clients": [], "game": game,
+                   "desired_player": desired_player, "score_board": {}}
         self.__session_numerator += 1
         self.__sessionlist.append(session)
-	print session
         return JSONEncoder().encode({"session_id":session["session_id"] })
 
     def join_session(self, client_id, session_id):
@@ -61,7 +60,7 @@ class SessionManager():
             return JSONEncoder().encode({ "isAvailable":True, "isGameStarted":True ,"game":session["game"] })
 #            else:
 
-            return JSONEncoder().encode({ "isAvailable":True , "isGameStarted":False })
+            return JSONEncoder().encode({ "isAvailable":True, "isGameStarted":False })
 
 
     def process_game_move(self, session_id, client_id, move):

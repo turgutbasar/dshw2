@@ -5,13 +5,11 @@ from gui.game_screen import SudokuApp
 from rpc.client import get_session_list, new_player, new_session, join_session
 from os.path import abspath, sep
 from sys import path,argv
+from sudoku.game import Sudoku
 
 # Vars -----------------------------------------------------------------
 nickname = ""
-login_screen_frame = None
-connect_server_screen_frame = None
-multiplayer_game_screen_frame = None
-new_session_screen_frame = None
+current_frame = None
 sudoku_app = None
 proxy = None
 client_id = None
@@ -44,19 +42,19 @@ def login_screen():
 
     read_names = open("nicknames", "r")
     names = read_names.read().split()
-    global login_screen_frame
-    login_screen_frame = Tk()
-    login_screen_frame.title("Enter Nickname")
-    lb_names = Listbox(login_screen_frame, selectmode='single')
+    global current_frame
+    current_frame = Tk()
+    current_frame.title("Enter Nickname")
+    lb_names = Listbox(current_frame, selectmode='single')
     lb_names.bind('<<ListboxSelect>>', on_select)
     for n in names:
         lb_names.insert(END,n)
     lb_names.pack()
-    btn_okay = Button(login_screen_frame, text="ok", command=lambda : get_nickname(tb_nick), width=20)
+    btn_okay = Button(current_frame, text="ok", command=lambda : get_nickname(tb_nick), width=20)
     btn_okay.pack({"side": "bottom"})
-    lbl_nickname = Label(login_screen_frame, text="Your Nickname")
+    lbl_nickname = Label(current_frame, text="Your Nickname")
     lbl_nickname.pack()
-    tb_nick = Text(login_screen_frame, width=50, height=5)
+    tb_nick = Text(current_frame, width=50, height=5)
     tb_nick.pack()
 
 # connect to server screen
@@ -78,19 +76,20 @@ def connect_server_screen():
                 error_message(session_list["error"])
             else:
                 multiplayer_game_screen(session_list) 
-    login_screen_frame.destroy()
-    global connect_server_screen_frame
-    connect_server_screen_frame = Tk()
-    connect_server_screen_frame.title("Enter Sudoku server address")
-    okay = Button(connect_server_screen_frame, text="ok", command=lambda:get_address_port(tb_addr, tb_port), width=20)
+    
+    global current_frame
+    current_frame.destroy()
+    current_frame = Tk()
+    current_frame.title("Enter Sudoku server address")
+    okay = Button(current_frame, text="ok", command=lambda:get_address_port(tb_addr, tb_port), width=20)
     okay.pack({"side": "bottom"})
-    lbl_address = Label(connect_server_screen_frame, text="Server Address",font=("Arial", 10))
+    lbl_address = Label(current_frame, text="Server Address",font=("Arial", 10))
     lbl_address.pack()
-    tb_addr = Text(connect_server_screen_frame, width=50, height=2, font=("Arial", 10))
+    tb_addr = Text(current_frame, width=50, height=2, font=("Arial", 10))
     tb_addr.pack()
-    lbl_port = Label(connect_server_screen_frame, text="Server Port",font=("Arial", 10))
+    lbl_port = Label(current_frame, text="Server Port",font=("Arial", 10))
     lbl_port.pack()
-    tb_port = Text(connect_server_screen_frame, width=50, height=2,font=("Arial", 10))
+    tb_port = Text(current_frame, width=50, height=2,font=("Arial", 10))
     tb_port.pack()
 
 # multiplayer game screen
@@ -105,18 +104,26 @@ def multiplayer_game_screen(list_sessions):
         if "error" in status:
             error_message(status["error"])
         else:
-            start_game_screen(status)
+	    global game
+	    if status["isAvailable"] and status["isGameStarted"]:
+	        game = status["game"]
+                start_game_screen(status["game"])
+	    elif status["isAvailable"] and not status["isGameStarted"]:
+		game = status["game"]
+		waiting_screen(status["game"])
+	    else:
+		info_message("Game is not available!")
 
-    connect_server_screen_frame.destroy()
-    global multiplayer_game_screen_frame
-    multiplayer_game_screen_frame = Tk()
-    multiplayer_game_screen_frame.title("Multiplayer Game Dialog ")
-    lb_sessions = Listbox(multiplayer_game_screen_frame,height = 5,font=("Arial", 10),selectmode='single')
+    global current_frame
+    current_frame.destroy()
+    current_frame = Tk()
+    current_frame.title("Multiplayer Game Dialog ")
+    lb_sessions = Listbox(current_frame,height = 5,font=("Arial", 10),selectmode='single')
     lb_sessions.bind('<<ListboxSelect>>', on_select)
     for session in list_sessions:
         lb_sessions.insert(END, session["session_id"])
     lb_sessions.pack()
-    btn_okay = Button(multiplayer_game_screen_frame, text="New Session", command = new_session_screen, width=20)
+    btn_okay = Button(current_frame, text="New Session", command = new_session_screen, width=20)
     btn_okay.pack({"side": "bottom"})
 
 # new session screen
@@ -126,7 +133,6 @@ def new_session_screen():
     	player_number = tb_player_number.get("1.0", 'end-1c')
     	if player_number is not None:
 	    global client_id
-	    print client_id
 	    global session_id
 	    global proxy
             session = new_session(proxy, client_id, player_number)
@@ -135,38 +141,42 @@ def new_session_screen():
             	error_message(session["error"])
             else:
                 status = join_session(proxy, client_id, session["session_id"])
-                start_game_screen(status)
-
-    multiplayer_game_screen_frame.destroy()
-    global new_session_screen_frame
-    new_session_screen_frame = Tk()
-    new_session_screen_frame.title("New Sudoku Solving Session")
-    lbl_player_number = Label(new_session_screen_frame, text="Number of Players:")
+		global game
+		print status
+		game = status["game"]
+		if not status["isGameStarted"]:
+		    waiting_screen()
+		else:
+		    start_game_screen()
+    
+    global current_frame
+    current_frame.destroy()
+    current_frame = Tk()
+    current_frame.title("New Sudoku Solving Session")
+    lbl_player_number = Label(current_frame, text="Number of Players:")
     lbl_player_number.pack()
-    tb_player_number = Text(new_session_screen_frame, width=50, height=2)
+    tb_player_number = Text(current_frame, width=50, height=2)
     tb_player_number.pack()
-    btn_okay = Button(new_session_screen_frame, text="Ok", command = lambda: session(tb_player_number), width=20)
+    btn_okay = Button(current_frame, text="Ok", command = lambda: session(tb_player_number), width=20)
     btn_okay.pack({"side": "bottom"})
-
-# start game screen
-def start_game_screen(status):
-    if not new_session_screen_frame:
-    	new_session_screen_frame.destroy()
-    if not multiplayer_game_screen_frame:
-    	multiplayer_game_screen_frame.destroy()
-
-    global sudoku_app
-    sudoku_screen_frame = Tk()
-    # TODO : Wait till all users connected! (Desired player count reached!)
-    sudoku_app = SudokuApp(sudoku_screen_frame, status["game"])
 
 # wait screen
 def waiting_screen():
-    global sudoku_app
-    sudoku_screen_frame = Tk()
-    # TODO : Wait till all users connected! (Desired player count reached!)
-    sudoku_app = SudokuApp(sudoku_screen_frame, status["game"])
+    global current_frame
+    current_frame.destroy()
+    current_frame = Tk()
+    current_frame.title("New Sudoku Solving Session")
+    lbl_waiting = Label(current_frame, text="Waiting Players...")
+    lbl_waiting.pack()
 
+# start game screen
+def start_game_screen():
+    global sudoku_app
+    global current_frame
+    global game
+    current_frame.destroy()
+    current_frame = Tk()
+    sudoku_app = SudokuApp(current_frame, Sudoku())
 
 if __name__ == '__main__':
     a_path = sep.join(abspath(argv[0]).split(sep)[:-1])
