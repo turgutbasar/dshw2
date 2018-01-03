@@ -3,9 +3,9 @@ import threading
 import logging
 import SocketServer
 from json import JSONEncoder
-import SimpleXMLRPCServer
 from sudoku.game import Sudoku
-import xmlrpclib
+import pika
+from json import JSONDecoder
 
 # Logging ---------------------------------------------------------------------
 logging.basicConfig(level=logging.INFO, format='%(asctime)s (%(threadName)-2s) %(message)s')
@@ -13,14 +13,43 @@ LOG = logging.getLogger()
 
 class SessionManager():
 
-    class SimpleThreadedXMLRPCServer(SocketServer.ThreadingMixIn, SimpleXMLRPCServer.SimpleXMLRPCServer):
-        pass
-
     def __init__(self):
         self.__sessionlist = []
         self.__clientlist = []
         self.__client_numerator = 0
         self.__session_numerator = 0
+	connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.__channel = connection.channel()
+        self.__channel.queue_declare(queue='main_queue')
+        self.__channel.exchange_declare(exchange='broadcast_exchange', exchange_type='fanout')
+        self.__channel.basic_qos(prefetch_count=1)
+        self.__channel.basic_consume(self.on_request, queue='main_queue')
+
+    def on_request(self,ch, method, props, body):
+    	args = JSONDecoder().decode(body)
+
+        if args["method"] == "new_player":
+            response = self.new_player(args["nickname"], args["br_ip"], args["br_port"])
+    	elif args["method"] == "new_session":
+            response = self.new_session(args["client_id"], args["desired_player"])
+    	elif args["method"] == "join_session":
+            response = self.join_session(args["client_id"], args["session_id"])
+    	elif args["method"] == "process_game_move":
+            response = self.process_game_move(args["session_id"], args["client_id"], args["move"])
+    	elif args["method"] == "client_left_session":
+            response = self.client_left_session(args["session_id"], args["client_id"])
+    	elif args["method"] == "client_left_server":
+            response = self.client_left_server(args["client_id"])
+    	elif args["method"] == "get_session_list":
+            response = self.get_session_list()
+    	else:
+	    response = JSONEncoder().encode({"response":"Message Not Being Recognized"})
+
+    	ch.basic_publish(exchange='',
+                     routing_key=props.reply_to,
+                     body=str(response))
+    	ch.basic_ack(delivery_tag = method.delivery_tag)
+
 
     def new_player(self, nickname, br_ip, br_port):
 	proxy = xmlrpclib.ServerProxy("http://" + br_ip + ":" + str(br_port) + "/")
@@ -88,13 +117,8 @@ class SessionManager():
     def get_session_list(self):
         return JSONEncoder().encode([session["session_id"] for session in self.__sessionlist])
 
-    def serve(self, ip, port):
-        server = SessionManager.SimpleThreadedXMLRPCServer((ip, port))
-        server.register_instance(self)
-        server.serve_forever()
+    def serve(self):
+        self.__channel.start_consuming()
 
-    def broadcast(self, msg):
-	# TODO : Clean garbage client connections !!!!!!!!!!	
-	# TODO : Do not register same ip port !!!!
-        for client in self.__clientlist:
-	    client["br_proxy"].on_broadcast(msg)
+    def broadcast(msg):
+        self.__channel.basic_publish(exchange='broadcast_exchange', routing_key='', body=str(msg))
