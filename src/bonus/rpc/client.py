@@ -4,6 +4,7 @@ import threading
 import SimpleXMLRPCServer
 import SocketServer
 import pika
+import json
 
 class Client(threading.Thread):
     def __init__(self):
