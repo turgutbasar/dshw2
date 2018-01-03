@@ -30,7 +30,7 @@ class Sudoku:
     # all the valid choices
     all_choices = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 
-    def __init__(self):
+    def __init__(self, game=None):
      
         self.sudoku_board = [["4","3","5","2","6","9","7","8","1"],
                ["6","8","2","5","7","1","4","9","3"],
@@ -41,6 +41,7 @@ class Sudoku:
                ["5","1","9","3","2","6","8","7","4"],
                ["2","4","8","9","5","7","1","3","6"],
                ["7","6","3","4","1","8","2","5","9"]]
+
         self._game = [[" "," "," ","2","6"," ","7"," ","1"],
                ["6","8"," "," ","7"," "," ","9"," "],
                ["1","9"," "," "," ","4","5"," "," "],
@@ -50,6 +51,9 @@ class Sudoku:
                [" "," ","9","3"," "," "," ","7","4"],
                [" ","4"," "," ","5"," "," ","3","6"],
                ["7"," ","3"," ","1","8"," "," "," "]]
+	if game:
+	    self.sudoku_board = game[0]
+	    self._game = game[1]
 
     def get_row(self, r):
       
@@ -95,6 +99,7 @@ class Sudoku:
         return choices
 
     def check (self, i, j, value):
+	# TODO : oosudoku mantigi daha basarili oyun mantigina calisacak vaktimiz olursa onu yapalim
         if self.sudoku_board[i][j] == value:
             self._game[i][j] = value
             if self.sudoku_board == self._game:
@@ -108,4 +113,3 @@ class Sudoku:
 
     def get_board (self):
         return self.sudoku_board
-

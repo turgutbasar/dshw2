@@ -1,18 +1,22 @@
-# Imports----------------------------------------------------------------------
 from Tkinter import *
 import tkMessageBox
-from rpc.client import get_session_list, new_player, new_session, join_session
+from rpc.client import RPCGameClient
 from sudoku.game import Sudoku, list_intersection
+from Queue import Queue
 
 class GUI():
 
-    def __init__(self):
+    def __init__(self, ip, port):
 	self.__current_frame = None
+	self.__brdcst_ip = ip
+	self.__brdcst_port = port
+	self.__brdcst_msgs = Queue()
 
     def new_screen(self, title):
 	if self.__current_frame:
 	    self.__current_frame.destroy()
 	self.__current_frame = Tk()
+	self.__current_frame.bind('<<BCastReceived>>', self.update_ui)
     	self.__current_frame.title("Enter Nickname")
 	def shutdown_ttk_repeat():
     	    self.__current_frame.eval('::ttk::CancelRepeat')
@@ -57,17 +61,11 @@ class GUI():
     	def get_address_port(tb_addr, tb_port):
     	    addr = tb_addr.get("1.0", 'end-1c')
     	    port = tb_port.get("1.0", 'end-1c')
-    	    player = new_player(self.__nickname, addr, port)
-    	    if "error" in player:
-	    	self.error_message(player["error"])
-    	    else:
-	    	self.__proxy = player["proxy"]
-            	self.__client_id = player["client_id"]["client_id"]
-            	session_list = get_session_list(self.__proxy)
-            	if "error" in session_list:
-                    self.error_message(session_list["error"])
-            	else:
-                    self.multiplayer_game_screen(session_list) 
+	    self.__client = RPCGameClient(addr, port, self.__brdcst_ip, self.__brdcst_port, self.on_broadcast)
+    	    player = self.__client.new_player(self.__nickname)
+            session_list = self.__client.get_session_list()
+            self.multiplayer_game_screen(session_list)
+
     	self.new_screen("Enter Sudoku server address")
 	btn_okay = Button(self.__current_frame, text="ok", command=lambda:get_address_port(tb_addr, tb_port), width=20)
 	btn_okay.pack({"side": "bottom"})
@@ -85,25 +83,18 @@ class GUI():
 
         def on_select(event):
 	    widget = event.widget
-	    self.__session_id = int(widget.get(widget.curselection()))
-            status = join_session(self.__proxy, self.__client_id, self.__session_id)
-            if "error" in status:
-            	error_message(status["error"])
-            else:
-	        if status["isAvailable"] and status["isGameStarted"]:
-	            self.__game = status["game"]
-                    self.start_game_screen()
-	        elif status["isAvailable"] and not status["isGameStarted"]:
-		    self.__game = status["game"]
-		    self.waiting_screen()
-	        else:
-		    self.info_message("Game is not available!")
+	    session_id = int(widget.get(widget.curselection()))
+            status = self.__client.join_session(session_id)
+	    if status["isAvailable"]:
+	        self.waiting_screen()
+	    else:
+	        self.info_message("Game is not available!")
 
 	self.new_screen("Multiplayer Game Dialog")
 	lb_sessions = Listbox(self.__current_frame,height = 5,font=("Arial", 10),selectmode='single')
 	lb_sessions.bind('<<ListboxSelect>>', on_select)
 	for session in list_sessions:
-            lb_sessions.insert(END, session["session_id"])
+            lb_sessions.insert(END, session)
 	lb_sessions.pack()
 	btn_okay = Button(self.__current_frame, text="New Session", command = self.new_session_screen, width=20)
 	btn_okay.pack({"side": "bottom"})
@@ -114,17 +105,9 @@ class GUI():
     	def session(tb_player_number):
     	    player_number = tb_player_number.get("1.0", 'end-1c')
     	    if player_number is not None:
-            	session = new_session(self.__proxy, self.__client_id, player_number)
-	    
-            	if "error" in session:
-            	    self.error_message(session["error"])
-            	else:
-                    status = join_session(self.__proxy, self.__client_id, session["session_id"])
-		    self.__game = status["game"]
-		    if not status["isGameStarted"]:
-		    	self.waiting_screen()
-		    else:
-		    	self.start_game_screen()
+            	session_id = self.__client.new_session(player_number)
+                status = self.__client.join_session(session_id)
+		self.waiting_screen()
     
         self.new_screen("New Sudoku Solving Session")
 	lbl_player_number = Label(self.__current_frame, text="Number of Players:")
@@ -138,10 +121,10 @@ class GUI():
     def waiting_screen(self):
 	self.new_screen("Waiting Players")
 	lbl_waiting = Label(self.__current_frame, text="Waiting Players...")
-	lbl_waiting.pack()
+	lbl_waiting.pack()	
 
     # start game screen
-    def start_game_screen(self):
+    def start_game_screen(self, game):
 	self.new_screen("Sudoku Game")
 
 	class NumberButtons(Frame):
@@ -162,12 +145,14 @@ class GUI():
 
     	    def get_current(self):
         	return self.current.get()
+	
 	class View(Frame):
-    	    def __init__(self, parent):
+    	    def __init__(self, parent, client):
             	Frame.__init__(self, parent, bg = "grey")
 
         	self.sudoku = None
         	self.numberbuttons = None
+         	self.__client = client
 
         	# Initialize the Canvas
         	self.CanvasSize = 500 
@@ -193,9 +178,9 @@ class GUI():
 
         	    self.CanvasGame.bind("<Button-1>", self.Write) # If the player left-click on the canvas => execute the method Write
 
-    	    def Update(self):
+    	    def Update(self, lbl):
         	# Update the Label
-        	self.labelVariable.set("")
+        	self.labelVariable.set(lbl)
         	# Update the Fixed Numbers --> All items which are "Fixed" tagged are displayed in red
         	for i in range(0,9):
             	    for j in range(0,9):
@@ -203,16 +188,13 @@ class GUI():
                     	    self.CanvasGame.itemconfig(self.table[j][i], text=self.sudoku._game[i][j], font = ("Courier New", "21", "bold"), tag='Fixed', fill="red")
 
 	    def Write(self, event):
-        	items = self.CanvasGame.find_enclosed(event.x - 35,event.y -35 , event.x +35,event.y +35) # We consider all items enclosed in a square 70x70 where the user clicked (the size of the square depends strongly on the canvas.size) 
-        	item = list_intersection(items, self.CanvasGame.find_withtag('Text')) # We just consider previous selected items which are empty "case"(i.e. item with a tag 'Text')
+        	items = self.CanvasGame.find_enclosed(event.x - 35,event.y -35 , event.x +35,event.y +35) 
+        	item = list_intersection(items, self.CanvasGame.find_withtag('Text')) 
         	if len(item) == 1:
             	    for i in range(0,9):
                 	for j in range(0,9):
                     	    if int(item[0]) == int(self.table[j][i]):
-                        	if str(self.numberbuttons.get_current()) in self.sudoku.choices(i,j): # We check what the user tries to insert is consistent with the available choices
-				    # TODO : Send server our result and check answer
-                            	    self.sudoku.set_entry(i,j,str(self.numberbuttons.get_current()))  # We Update game[][]
-                            	    self.Update() # We update the display
+			        self.__client.process_game_move({"i":i, "j":j, "value":str(self.numberbuttons.get_current())})
         
             def SetNumberButtons(self, numberbuttons):
                 self.numberbuttons = numberbuttons
@@ -222,26 +204,44 @@ class GUI():
 
         self.__current_frame.config(bg = "grey")
         self.__current_frame.resizable(0,0)
-	# TODO : Implement broadcaster callback to update label below sudoku board
         F1 = Frame(self.__current_frame, bd=5, bg = "grey", relief="sunken")
         F2 = Frame(self.__current_frame, bg="grey")
-        view = View(F1)
+        self.__view = View(F1, self.__client)
         numberbuttons = NumberButtons(F2)
-        view.SetNumberButtons(numberbuttons)
+        self.__view.SetNumberButtons(numberbuttons)
         F1.pack(fill = Y, side=LEFT)
         F2.pack(fill = Y, side=LEFT)
-        view.pack(side = LEFT, padx = 30)
+        self.__view.pack(side = LEFT, padx = 30)
         numberbuttons.pack(side = LEFT, padx = 20)
-	view.SetSudoku(Sudoku())
-        view.Update()
-	# TODO : Detect application closes and send disconnect to server or implement a heartbeat to clean forced closes
+	self.__view.SetSudoku(game)
+        self.__view.Update("Game Started")
 
-    def error_message(self, message):
-        tkMessageBox.showerror("Error", message)
+    def on_broadcast(self, msg):
+	self.__brdcst_msgs.put(msg)
+	print(msg)
 
+    def update_ui(self):
+	try:
+	    msg = self.__brdcst_msgs.get(False)
+	    if msg:
+		# TODO : Score Update, Winner Message (Label is not showing)etc.
+	        if msg["msg_type"] == "game_started":
+	            self.start_game_screen(Sudoku(msg["game"]))
+	        elif msg["msg_type"] == "move":
+	            self.__view.SetSudoku(Sudoku(msg["game"]))
+	            self.__view.Update("Move!")
+	        elif msg["msg_type"] == "player_left":
+	            self.__view.Update("Player Left")
+	        elif msg["msg_type"] == "game_ended":
+	            self.__view.Update("Game Ended")
+	except:
+	    pass
+	
     def info_message(self, message):
         tkMessageBox.showinfo("Info", message)
 
     def gui_start(self):
     	self.login_screen()
-    	mainloop()    
+    	while(True):
+	    self.update_ui()
+	    self.__current_frame.update()
