@@ -90,20 +90,20 @@ class RPCGameClient():
     def new_player(self, nickname):
         try:
             if nickname is not None:
-                self.__client_id = self.client.call(JSONDecoder().decode({"method":"new_player", "params":nickname})
+                self.__client_id = self.client.call(JSONDecoder().encode({"method":"new_player", "params":nickname})
                 return {}
         except Exception as e:
             return {'error': e}
 
     def new_session(self, desired_player):
         try:
-            return JSONDecoder().decode(self.__proxy.new_session(self.__client_id, desired_player))["session_id"]
+            return JSONDecoder().decode(Client.call.new_session({"client_id": self.__client_id, "desired_player": desired_player}))["session_id"]
         except Exception as e:
             return {'error': e}
 
     def join_session(self, session_id):
         try:
-            status = JSONDecoder().decode(self.__proxy.join_session(self.__client_id, session_id))
+            status = self.client.call(JSONDecoder().decode({"method": "join_session", "session_id": session_id}))
             if status["isAvailable"]:
                 self.__session_id = session_id
                 self.__broadcast_receiver.session_id = session_id
@@ -114,7 +114,7 @@ class RPCGameClient():
 
     def process_game_move(self, move):
         try:
-            JSONDecoder().decode(self.__proxy.process_game_move(self.__session_id, self.__client_id, move))
+            JSONDecoder().decode(Client.call.process_game_move({"session_id": self.__session_id, "client_id": self.__client_id, "move": move))
             return {}
         except Exception as e:
             print(e)
@@ -122,7 +122,7 @@ class RPCGameClient():
 
     def client_left_session(self):
         try:
-            JSONDecoder().decode(self.__proxy.client_left_session(self.__session_id, self.__client_id))
+            JSONDecoder().decode(Client.call.client_left_session({"session_id": self.__session_id, "client_id": self.__client_id}))
             self.__session_id = None
             self.__broadcast_receiver.session_id = None
             return {}
@@ -138,6 +138,6 @@ class RPCGameClient():
 
     def get_session_list(self):
         try:
-            return JSONDecoder().decode(self.__proxy.get_session_list())
+            return JSONDecoder().decode(Client.call.get_session_list())
         except Exception as e:
             return {'error': e}
