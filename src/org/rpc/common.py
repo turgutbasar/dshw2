@@ -1,0 +1,8 @@
+# Client Side RPC Broadcast Receive End Point Defaults
+DEFAULT_CLIENT_RPC_BRDCST_ADDR = '127.0.0.1'
+DEFAULT_CLIENT_RPC_BRDCST_PORT = 7778
+
+# Server Side RPC End Point Defaults
+DEFAULT_SERVER_RPC_ADDR = '127.0.0.1'
+DEFAULT_SERVER_RPC_PORT = 7777
+
