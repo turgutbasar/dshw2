@@ -3,7 +3,8 @@ from json import JSONDecoder
 import threading
 import SimpleXMLRPCServer
 import SocketServer
-
+import pika
+import json
 
 class Client(threading.Thread):
     def __init__(self):
@@ -79,10 +80,8 @@ class RPCGameClient():
             server.register_instance(self)
             server.serve_forever()
 
-    def __init__(self, server_address, server_port, brcst_server_address, brcst_server_port, brcst_callback):
-        self.__proxy = xmlrpclib.ServerProxy("http://" + server_address + ":" + server_port + "/")
-        self.__br_ip = brcst_server_address
-        self.__br_port = brcst_server_port
+    def __init__(self, brcst_server_address, brcst_server_port, brcst_callback):
+        self.client = Client()
         self.__broadcast_receiver = RPCGameClient.BroadcastReceiver(brcst_callback, brcst_server_address,
                                                                     brcst_server_port)
         self.__broadcast_receiver.setDaemon(True)
@@ -91,8 +90,7 @@ class RPCGameClient():
     def new_player(self, nickname):
         try:
             if nickname is not None:
-                self.__client_id = \
-                JSONDecoder().decode(self.__proxy.new_player(nickname, self.__br_ip, self.__br_port))["client_id"]
+                self.__client_id = self.client.call(JSONDecoder().decode({"method":"new_player", "params":nickname})
                 return {}
         except Exception as e:
             return {'error': e}
