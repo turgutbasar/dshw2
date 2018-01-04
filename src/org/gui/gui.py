@@ -16,7 +16,6 @@ class GUI():
 	if self.__current_frame:
 	    self.__current_frame.destroy()
 	self.__current_frame = Tk()
-	self.__current_frame.bind('<<BCastReceived>>', self.update_ui)
     	self.__current_frame.title("Enter Nickname")
 	def shutdown_ttk_repeat():
     	    self.__current_frame.eval('::ttk::CancelRepeat')
@@ -174,7 +173,7 @@ class GUI():
         	    self.labelVariable = StringVar()
         	    self.labelVariable.set("")
         	    self.label = Label(self, textvariable=self.labelVariable, font = ("Courier New", "21", "bold"), bg="grey", fg="red")
-        	    self.label.pack(pady = 10)
+        	    self.label.pack(pady = 10, side = TOP)
 
         	    self.CanvasGame.bind("<Button-1>", self.Write) # If the player left-click on the canvas => execute the method Write
 
@@ -224,16 +223,23 @@ class GUI():
 	try:
 	    msg = self.__brdcst_msgs.get(False)
 	    if msg:
-		# TODO : Score Update, Winner Message (Label is not showing)etc.
 	        if msg["msg_type"] == "game_started":
 	            self.start_game_screen(Sudoku(msg["game"]))
 	        elif msg["msg_type"] == "move":
 	            self.__view.SetSudoku(Sudoku(msg["game"]))
-	            self.__view.Update("Move!")
+                    points = ""
+		    for user in ["user(" + str(user) + "):" + msg["score_board"][user] for user in msg["score_board"].keys()]:
+                    	points += user
+		    self.__view.Update(points)
 	        elif msg["msg_type"] == "player_left":
+		    # TODO : Show left user
 	            self.__view.Update("Player Left")
 	        elif msg["msg_type"] == "game_ended":
-	            self.__view.Update("Game Ended")
+	            winner_id = msg["winner"]
+		    if self.__client.__client_id == winner_id:
+			self.info_message("You WIN!")
+		    else:
+			self.info_message("You LOST!")
 	except:
 	    pass
 	
