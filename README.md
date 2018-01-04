@@ -1,8 +1,8 @@
 # Tartu_ds2017_hw2
 The second homework of DS course, Masters, University of Tartu
-Aytaj Aghabayli
-Gunay Abdullayeva
-Basar Turgut
+Aytaj Aghabayli, 
+Gunay Abdullayeva, 
+Basar Turgut, 
 Mansur Alizada
 
 Install Tkinter
