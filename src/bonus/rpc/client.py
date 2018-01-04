@@ -1,10 +1,6 @@
-import xmlrpclib
 from json import JSONEncoder,JSONDecoder
 import threading
-import SimpleXMLRPCServer
-import SocketServer
 import pika
-import json
 
 class Client(threading.Thread):
 
@@ -12,15 +8,12 @@ class Client(threading.Thread):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self.channel = self.connection.channel()
         self.callback_queue = self.channel.queue_declare(exclusive=True).method.queue
-        self.broadcast_queue = self.channel.queue_declare(exclusive=True).method.queue
-        self.__callback = callback
-        self.channel.queue_bind(exchange='broadcast_exchange', queue=self.broadcast_queue)
+        #self.broadcast_queue = self.channel.queue_declare(exclusive=True).method.queue
+        #self.__callback = callback
+        #self.channel.queue_bind(exchange='broadcast_exchange', queue=self.broadcast_queue)
 
-        self.channel.basic_consume(self.__on_callback, no_ack=True,
-                                   queue=self.callback_queue)
-
-        self.channel.basic_consume(self.__on_broadcast, no_ack=True,
-                                   queue=self.broadcast_queue)
+        #self.channel.basic_consume(self.__on_broadcast, no_ack=True,
+        #                           queue=self.broadcast_queue)
         threading.Thread.__init__(self)
 
 
@@ -60,14 +53,14 @@ class RPCGameClient():
 
     def new_session(self, desired_player):
         try:
-
-            return JSONDecoder().decode(self.client.call.new_session({"client_id": self.__client_id, "desired_player": desired_player}))["session_id"]
+            return self.client.call(JSONDecoder().decode({"method": "new_session","params": {"client_id": self.__client_id, "desired_player": desired_player}}))
         except Exception as e:
             return {'error': e}
 
     def join_session(self, session_id):
         try:
-            status = self.client.call(JSONEncoder().encode({"method":"join_session", "params":{"client_id": self.__client_id, "session_id": session_id}})
+            status = self.client.call(JSONEncoder().encode({"method":"join_session", "params":{"client_id": self.__client_id,"session_id": session_id}}))
+
             if status["isAvailable"]:
                 self.__session_id = session_id
                 self.__broadcast_receiver.session_id = session_id
@@ -93,12 +86,11 @@ class RPCGameClient():
         except Exception as e:
             return {'error': e}
 
-    '''def client_left_server(proxy, client_id):
+    def client_left_server(self, client_id):
         try:
-            status = JSONDecoder().decode(proxy.client_left_server(client_id))
-            return status
+            return self.client.call(JSONEncoder().encode({"method": "client_left_server","params": {"client_id": self.__client_id}}))
         except Exception as e:
-            return {'error': e}'''
+            return {'error': e}
 
     def get_session_list(self):
         try:

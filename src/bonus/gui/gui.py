@@ -16,7 +16,6 @@ class GUI():
         if self.__current_frame:
             self.__current_frame.destroy()
         self.__current_frame = Tk()
-        self.__current_frame.bind('<<BCastReceived>>', self.update_ui)
         self.__current_frame.title("Enter Nickname")
 
         def shutdown_ttk_repeat():
@@ -63,7 +62,7 @@ class GUI():
         def get_address_port(tb_addr, tb_port):
             addr = tb_addr.get("1.0", 'end-1c')
             port = tb_port.get("1.0", 'end-1c')
-            self.__client = RPCGameClient(addr, port, self.__brdcst_ip, self.__brdcst_port, self.on_broadcast)
+            self.__client = RPCGameClient(self.on_broadcast)
             player = self.__client.new_player(self.__nickname)
             session_list = self.__client.get_session_list()
             self.multiplayer_game_screen(session_list)

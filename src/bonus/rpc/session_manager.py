@@ -26,21 +26,22 @@ class SessionManager():
         self.__channel.basic_consume(self.on_request, queue='main_queue')
 
     def on_request(self,ch, method, props, body):
-    	args = JSONDecoder().decode(body)
+    	msg = JSONDecoder().decode(body)
+	params = msg["params"]
 
-        if args["method"] == "new_player":
-            response = self.new_player(args["nickname"], args["br_ip"], args["br_port"])
-    	elif args["method"] == "new_session":
-            response = self.new_session(args["client_id"], args["desired_player"])
-    	elif args["method"] == "join_session":
-            response = self.join_session(args["client_id"], args["session_id"])
-    	elif args["method"] == "process_game_move":
-            response = self.process_game_move(args["session_id"], args["client_id"], args["move"])
-    	elif args["method"] == "client_left_session":
-            response = self.client_left_session(args["session_id"], args["client_id"])
-    	elif args["method"] == "client_left_server":
-            response = self.client_left_server(args["client_id"])
-    	elif args["method"] == "get_session_list":
+        if msg["method"] == "new_player":
+            response = self.new_player(params["nickname"], params["br_ip"], params["br_port"])
+    	elif msg["method"] == "new_session":
+            response = self.new_session(params["client_id"], params["desired_player"])
+    	elif msg["method"] == "join_session":
+            response = self.join_session(params["client_id"], params["session_id"])
+    	elif msg["method"] == "process_game_move":
+            response = self.process_game_move(params["session_id"], params["client_id"], params["move"])
+    	elif msg["method"] == "client_left_session":
+            response = self.client_left_session(params["session_id"], params["client_id"])
+    	elif msg["method"] == "client_left_server":
+            response = self.client_left_server(params["client_id"])
+    	elif msg["method"] == "get_session_list":
             response = self.get_session_list()
     	else:
 	    response = JSONEncoder().encode({"response":"Message Not Being Recognized"})
