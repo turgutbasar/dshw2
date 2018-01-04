@@ -36,10 +36,12 @@ class Client(threading.Thread):
                                        reply_to=self.callback_queue
                                    ),
                                    body=str(n))
+	while self.call_back_response is None:
+            self.connection.process_data_events()
+        return int(self.call_back_response)
 
     def run(self):
         self.channel.start_consuming()
-
 
 class RPCGameClient():
 
