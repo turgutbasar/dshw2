@@ -5,7 +5,7 @@ Gunay Abdullayeva,
 Basar Turgut, 
 Mansur Alizada
 
-Install Tkinter
+Install Tkinter: 
 apt-get install python-tk
 
 Install pika
@@ -14,22 +14,22 @@ Install pika
 
 Folder org contains obligatory part 1 and 2.
 
-To run server command:
+To run server command: 
 python server.py -p[Port] -l[Adress]
 
 
-To run client command:
+To run client command: 
 python client.py 
 
 
 
 Folder bonus contains optional part 3.
 
-To run server command:
+To run server command: 
 python server.py
 
 
-To run client command:
+To run client command: 
 python client.py
 
 
