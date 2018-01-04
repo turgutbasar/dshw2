@@ -1,5 +1,5 @@
 import xmlrpclib
-from json import JSONEncoder
+from json import JSONEncoder,JSONDecoder
 import threading
 import SimpleXMLRPCServer
 import SocketServer
@@ -13,7 +13,7 @@ class Client(threading.Thread):
         self.channel = self.connection.channel()
         self.callback_queue = self.channel.queue_declare(exclusive=True).method.queue
         self.broadcast_queue = self.channel.queue_declare(exclusive=True).method.queue
-	self.__callback = callback
+        self.__callback = callback
         self.channel.queue_bind(exchange='broadcast_exchange', queue=self.broadcast_queue)
 
         self.channel.basic_consume(self.__on_callback, no_ack=True,
@@ -25,8 +25,8 @@ class Client(threading.Thread):
 
 
     def __on_broadcast(self, ch, method, props, body):
-	msg = JSONDecoder().decode(body)
-            self.__callback(msg)
+        msg = JSONDecoder().decode(body)
+        self.__callback(msg)
 
     def call(self, n):
         self.call_back_response = None
@@ -45,8 +45,8 @@ class RPCGameClient():
 
     def __init__(self, brcst_callback):
         self.client = Client(brcst_callback)
-	self.client.setDaemon(True)
-	self.client.start()
+        self.client.setDaemon(True)
+        self.client.start()
 
     def new_player(self, nickname):
         try:
@@ -58,13 +58,14 @@ class RPCGameClient():
 
     def new_session(self, desired_player):
         try:
+
             return JSONDecoder().decode(self.client.call.new_session({"client_id": self.__client_id, "desired_player": desired_player}))["session_id"]
         except Exception as e:
             return {'error': e}
 
     def join_session(self, session_id):
         try:
-            status = JSONDecoder().decode(Client.call.join_session({"client_id": self.__client_id, "session_id": session_id}))
+            status = self.client.call(JSONEncoder().encode({"method":"join_session", "params":{"client_id": self.__client_id, "session_id": session_id}})
             if status["isAvailable"]:
                 self.__session_id = session_id
                 self.__broadcast_receiver.session_id = session_id
